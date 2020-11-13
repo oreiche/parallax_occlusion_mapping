@@ -1,0 +1,1 @@
+add_executable(pom_cpp main.cpp)

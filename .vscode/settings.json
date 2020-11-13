@@ -1,0 +1,7 @@
+{
+    "clang-format.executable": ".toolchain/bin/clang-format",
+    "clang-tidy.executable": ".toolchain/bin/clang-tidy",
+    "clang-tidy.compilerArgs": [
+        "-std=c++17",
+    ],
+}
