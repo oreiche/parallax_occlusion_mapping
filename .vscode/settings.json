@@ -1,7 +1,8 @@
 {
-    "clang-format.executable": ".toolchain/bin/clang-format",
-    "clang-tidy.executable": ".toolchain/bin/clang-tidy",
+    "clang-format.executable": ".externals/llvm_toolchain/bin/clang-format",
+    "clang-tidy.executable": ".externals/llvm_toolchain/bin/clang-tidy",
     "clang-tidy.compilerArgs": [
         "-std=c++17",
+        "-I.externals/github_gsl_lite/include"
     ],
 }

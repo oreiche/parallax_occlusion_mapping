@@ -1,2 +1,8 @@
 FormatStyle: Google
-Checks: 'bugprone-*,cppcoreguidelines-*,hicpp-*,modernize-,performance-*,readability-*'
+Checks: '*,-abseil-*,-altera-*,-android-*,-boost-*,-cert-*,-darwin-*,-fuchsia-*,-linuxkernel-*,-llvm-*,-llvmlibc-*,-mpi-*,-objc-*,-zircon-*'
+CheckOptions: [
+  {
+    key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic,
+    value: '1'
+  }
+]

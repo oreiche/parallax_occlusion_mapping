@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-export PATH=".toolchain/bin:$PATH"
+export PATH=".externals/llvm_toolchain/bin:$PATH"
 
 readonly STORAGE_DIR="${TMPDIR:-/tmp}/run-clang-format_$USER"
 readonly EXEC_DIR="$STORAGE_DIR/exec.$$"

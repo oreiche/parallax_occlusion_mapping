@@ -2,11 +2,10 @@
 
 set -euo pipefail
 
-export PATH=".toolchain/bin:$PATH"
-
 readonly CC_FLAGS=(
   "-std=c++17"
   "-I."
+  "-I.externals/gsl-lite/include"
 )
 
 readonly STORAGE_DIR="${TMPDIR:-/tmp}/run-clang-tidy_$USER"
@@ -21,6 +20,7 @@ function usage() {
   echo
   echo "Possible OPTIONs are:"
   echo "  -e REGEX  exclude regex pattern"
+  echo "  -f        fix issues of all files"
   echo "  -j N      jobs to run in parallel"
   echo "  -n        no cache from previous runs"
   echo "  -s        stop and exit on first error"
@@ -72,40 +72,48 @@ readonly CFG_HASH="$(compute_hash "$(clang-tidy -dump-config)")"
 
 function exec_clang_tidy() {
   local SRC_FILE="$1"
-  local NO_CACHE=${2:-false}
+  local FIX_ISSUES=${2:-false}
+  local NO_CACHE=${3:-false}
   local JOB_PID=$BASHPID
 
-  local CACHE_ENTRY=
+  if $FIX_ISSUES; then
+    # fix issues in-place
+    clang-tidy -fix-errors ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
+              2>/dev/null >"$LOG_DIR/$JOB_PID" || true
+  else
+    local CACHE_ENTRY=
 
-  if ! $NO_CACHE; then
-    # compute hash from file content with all headers included
-    local FILE_CONTENT="$(clang -E ${CC_FLAGS[@]} "${SRC_FILE}" 2>/dev/null)"
-    local FILE_HASH="$(compute_hash "$FILE_CONTENT")"
+    if ! $NO_CACHE; then
+      # compute hash from file content with all headers included
+      local FILE_CONTENT="$(clang -E ${CC_FLAGS[@]} "${SRC_FILE}" 2>/dev/null)"
+      local FILE_HASH="$(compute_hash "$FILE_CONTENT")"
 
-    # compute cache entry and exit on cache hit
-    CACHE_ENTRY="$CACHE_DIR/$(compute_hash "$VER_HASH+$CFG_HASH+$FILE_HASH")"
-    if [ -f "$CACHE_ENTRY" ]; then return; fi
-  fi
+      # compute cache entry and exit on cache hit
+      CACHE_ENTRY="$CACHE_DIR/$(compute_hash "$VER_HASH+$CFG_HASH+$FILE_HASH")"
+      if [ -f "$CACHE_ENTRY" ]; then return; fi
+    fi
 
-  # exec clang-tidy and store log for this job
-  clang-tidy ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
-             2>/dev/null >"$LOG_DIR/$JOB_PID" || true
+    # exec clang-tidy and store log for this job
+    clang-tidy ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
+              2>/dev/null >"$LOG_DIR/$JOB_PID" || true
 
-  # if issues are related to this file (and not only to its dependencies)
-  if parse_issues_from_log "$LOG_DIR/$JOB_PID" "$SRC_FILE" &>/dev/null; then
-    # record failure and store this job's pid (atomic create and rename dance)
-    echo $JOB_PID > "$FAIL_FLAG.$JOB_PID"
-    mv --no-clobber "$FAIL_FLAG.$JOB_PID" "$FAIL_FLAG"
-  elif [ -n "$CACHE_ENTRY" ]; then
-    # record success by creating cache entry and remove log
-    touch "$CACHE_ENTRY"
-    rm -f "$LOG_DIR/$JOB_PID"
+    # if issues are related to this file (and not only to its dependencies)
+    if parse_issues_from_log "$LOG_DIR/$JOB_PID" "$SRC_FILE" &>/dev/null; then
+      # record failure and store this job's pid (atomic create and rename dance)
+      echo $JOB_PID > "$FAIL_FLAG.$JOB_PID"
+      mv --no-clobber "$FAIL_FLAG.$JOB_PID" "$FAIL_FLAG"
+    else
+      # record success by creating cache entry and remove log
+      if [ -n "$CACHE_ENTRY" ]; then touch "$CACHE_ENTRY"; fi
+      rm -f "$LOG_DIR/$JOB_PID"
+    fi
   fi
 }
 
 function run_clang_tidy() {
   local SRC_DIR="$(pwd)"
   local EXCL_REGX=
+  local FIX_ISSUES=false
   local NO_CACHE=false
   local JOB_LIMIT=$(nproc --all)
   local STOP_ON_FAILURE=false
@@ -118,7 +126,7 @@ function run_clang_tidy() {
   fi
 
   # parse remaining arguments
-  while getopts "h?e:j:nsv" OPT "$@"; do
+  while getopts "h?e:fj:nsv" OPT "$@"; do
     case "${OPT}" in
       h|\?)
         usage
@@ -126,6 +134,9 @@ function run_clang_tidy() {
         ;;
       e)
         EXCL_REGX="${OPTARG}"
+        ;;
+      f)
+        FIX_ISSUES=true
         ;;
       j)
         JOB_LIMIT="${OPTARG}"
@@ -166,7 +177,7 @@ function run_clang_tidy() {
     if $STOP_ON_FAILURE && [ -f "$FAIL_FLAG" ]; then break; fi
 
     # execute clang-tidy as background job
-    exec_clang_tidy "$SRC_FILE" $NO_CACHE &
+    exec_clang_tidy "$SRC_FILE" $FIX_ISSUES $NO_CACHE &
 
     # record new child pid
     CHILD_PIDS=($(collect_running_pids "${CHILD_PIDS[@]}" "$!"))
