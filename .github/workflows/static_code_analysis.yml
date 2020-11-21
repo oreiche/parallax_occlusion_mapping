@@ -1,0 +1,44 @@
+name: Static Code Analysis
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  clang-format:
+    name: Clang Format
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install recent CMake
+        run: sh .github/install_cmake.sh /tmp/cmake
+
+        # get toolchain and external dependencies
+      - name: Configure project
+        run: /tmp/cmake/bin/cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
+
+      - name: Run clang-format
+        run: bash .github/run-clang-format.sh cpp/ -v
+
+  clang-tidy:
+    name: Clang Tidy
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install recent CMake
+        run: sh .github/install_cmake.sh /tmp/cmake
+
+        # get toolchain and external dependencies
+      - name: Configure project
+        run: /tmp/cmake/bin/cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
+
+      - name: Run clang-tidy
+        run: bash .github/run-clang-tidy.sh cpp/ -v
