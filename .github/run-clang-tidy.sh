@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+export PATH=".externals/llvm_toolchain/bin:$PATH"
+
 readonly CC_FLAGS=(
   "-std=c++17"
   "-I."
