@@ -2,10 +2,12 @@
 
 set -euo pipefail
 
+export PATH=".externals/llvm_toolchain/bin:$PATH"
+
 readonly CC_FLAGS=(
   "-std=c++17"
   "-I."
-  "-I.externals/gsl-lite/include"
+  "-I.externals/github_gsl_lite/include"
 )
 
 readonly STORAGE_DIR="${TMPDIR:-/tmp}/run-clang-tidy_$USER"
