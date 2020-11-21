@@ -11,6 +11,6 @@ http_archive(
 # Set compiler paths
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
-set(CMAKE_C_COMPILER "${llvm_toolchain_ROOT}/bin/clang")
-set(CMAKE_CXX_COMPILER "${llvm_toolchain_ROOT}/bin/clang++")
+set(CMAKE_C_COMPILER "${llvm_toolchain_ROOT}/bin/clang" CACHE FILEPATH "C Compiler")
+set(CMAKE_CXX_COMPILER "${llvm_toolchain_ROOT}/bin/clang++" CACHE FILEPATH "C++ Compiler")
 set(CMAKE_CXX_FLAGS "-stdlib=libc++")
