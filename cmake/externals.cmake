@@ -36,6 +36,9 @@ macro(http_archive)
         message(FATAL_ERROR "Missing mandatory argument")
     endif()
 
+    unset(DOWNLOAD_EXTRA_ARGS)
+    unset(EXTRACT_EXTRA_ARGS)
+
     if (HTTP_ARCHIVE_SHA256)
         set(DOWNLOAD_EXTRA_ARGS ${DOWNLOAD_EXTRA_ARGS}
             EXPECTED_HASH SHA256=${HTTP_ARCHIVE_SHA256})
