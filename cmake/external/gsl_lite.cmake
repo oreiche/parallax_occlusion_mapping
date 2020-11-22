@@ -10,5 +10,6 @@ http_archive(
     STRIP    "gsl-lite-0.37.0")
 
 # Create header-only library
-add_library(gsl_lite INTERFACE)
-target_include_directories(gsl_lite INTERFACE ${github_gsl_lite_ROOT}/include)
+add_library(github_gsl_lite INTERFACE)
+target_include_directories(github_gsl_lite
+                           INTERFACE ${github_gsl_lite_ROOT}/include)

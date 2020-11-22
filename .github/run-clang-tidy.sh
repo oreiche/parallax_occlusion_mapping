@@ -6,8 +6,10 @@ export PATH=".externals/llvm_toolchain/bin:$PATH"
 
 readonly CC_FLAGS=(
   "-std=c++17"
-  "-I."
+  "-DGLEW_NO_GLU"
   "-I.externals/github_gsl_lite/include"
+  "-I.externals/github_glew/include"
+  "-I.externals/github_glfw/include"
 )
 
 readonly STORAGE_DIR="${TMPDIR:-/tmp}/run-clang-tidy_$USER"
