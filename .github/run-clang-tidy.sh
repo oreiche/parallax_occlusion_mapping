@@ -29,6 +29,10 @@ function usage() {
   echo "  -v        verbose, print errors and warnings"
 }
 
+function compute_hash() {
+  echo "$1" | sha1sum | cut -d' ' -f1
+}
+
 function job_limit_reached() {
   local JOB_LIMIT=$1
   shift
@@ -65,23 +69,18 @@ function parse_issues_from_log() {
   return 1
 }
 
-function compute_hash() {
-  echo "$1" | sha1sum | cut -d' ' -f1
-}
-
-readonly VER_HASH="$(compute_hash "$(clang-tidy -version)")"
-readonly CFG_HASH="$(compute_hash "$(clang-tidy -dump-config)")"
-
 function exec_clang_tidy() {
   local SRC_FILE="$1"
-  local FIX_ISSUES=${2:-false}
-  local NO_CACHE=${3:-false}
+  local VER_HASH="$2"
+  local CFG_HASH="$3"
+  local FIX_ISSUES=${4:-false}
+  local NO_CACHE=${5:-false}
   local JOB_PID=$BASHPID
 
   if $FIX_ISSUES; then
     # fix issues in-place
     clang-tidy -fix-errors ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
-              2>/dev/null >"$LOG_DIR/$JOB_PID" || true
+              2>/dev/null >"$LOG_DIR/$JOB_PID"
   else
     local CACHE_ENTRY=
 
@@ -97,7 +96,7 @@ function exec_clang_tidy() {
 
     # exec clang-tidy and store log for this job
     clang-tidy ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
-              2>/dev/null >"$LOG_DIR/$JOB_PID" || true
+              2>/dev/null >"$LOG_DIR/$JOB_PID"
 
     # if issues are related to this file (and not only to its dependencies)
     if parse_issues_from_log "$LOG_DIR/$JOB_PID" "$SRC_FILE" &>/dev/null; then
@@ -158,9 +157,19 @@ function run_clang_tidy() {
   mkdir -p "$LOG_DIR"
   mkdir -p "$CACHE_DIR"
 
+  if ! command -v clang &>/dev/null; then
+    echo "Error: Cannot find clang in PATH"
+    return 1
+  elif ! command -v clang-tidy &>/dev/null; then
+    echo "Error: Cannot find clang-tidy in PATH"
+    return 1
+  fi
+
   printf "Running clang-tidy on %s\n" "$SRC_DIR"
 
   local RETVAL=0 CHILD_PIDS=() PID_FILE_MAP=() SRC_FILE
+  local VER_HASH="$(compute_hash "$(clang-tidy -version)")"
+  local CFG_HASH="$(compute_hash "$(clang-tidy -dump-config)")"
 
   while read -r SRC_FILE; do
     # skip non-C/C++ files
@@ -179,7 +188,7 @@ function run_clang_tidy() {
     if $STOP_ON_FAILURE && [ -f "$FAIL_FLAG" ]; then break; fi
 
     # execute clang-tidy as background job
-    exec_clang_tidy "$SRC_FILE" $FIX_ISSUES $NO_CACHE &
+    exec_clang_tidy "$SRC_FILE" $VER_HASH $CFG_HASH $FIX_ISSUES $NO_CACHE &
 
     # record new child pid
     CHILD_PIDS=($(collect_running_pids "${CHILD_PIDS[@]}" "$!"))
