@@ -33,7 +33,7 @@ macro(http_archive)
          "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if (NOT HTTP_ARCHIVE_NAME OR NOT HTTP_ARCHIVE_URL)
-        message(FATAL_ERROR "Missing mandatory argument")
+        message(FATAL_ERROR "[externals] Missing mandatory argument")
     endif()
 
     unset(DOWNLOAD_EXTRA_ARGS)
@@ -60,7 +60,7 @@ macro(http_archive)
     set(EXTRACT_PATH "${EXTERNALS_FETCH_DIR}/${HTTP_ARCHIVE_NAME}")
     set(STAGE_PATH "${EXTERNALS_STAGE_DIR}/${HTTP_ARCHIVE_NAME}")
 
-    message(STATUS "Downloading external ${HTTP_ARCHIVE_NAME}")
+    message(STATUS "[externals] Downloading ${HTTP_ARCHIVE_NAME}")
 
     file(DOWNLOAD "${HTTP_ARCHIVE_URL}"
         ${DOWNLOAD_FILE}
@@ -73,8 +73,8 @@ macro(http_archive)
         # Download call successful, file might have existed before
         if ("${EXIT_MESSAGE}" STREQUAL "\"No error\""
             OR NOT EXISTS "${STAGE_PATH}")
-            # New file was successfully downloaded
-            message(STATUS "Extracting external ${HTTP_ARCHIVE_NAME}")
+            # New file was s[uccessfully downloaded
+            message(STATUS "[externals] Extracting ${HTTP_ARCHIVE_NAME}")
             file(ARCHIVE_EXTRACT
                 INPUT "${DOWNLOAD_FILE}"
                 DESTINATION "${EXTRACT_PATH}"
@@ -84,10 +84,10 @@ macro(http_archive)
                         "${STAGE_PATH}")
             file(REMOVE_RECURSE "${EXTRACT_PATH}")
         else()
-            message(STATUS "External ${HTTP_ARCHIVE_NAME} is up to date")
+            message(STATUS "[externals] ${HTTP_ARCHIVE_NAME} is up to date")
         endif()
         set(${HTTP_ARCHIVE_NAME}_ROOT "${STAGE_PATH}")
     else()
-        message(FATAL_ERROR "Failed to download ${HTTP_ARCHIVE_NAME} with ${RETVAL}")
+        message(FATAL_ERROR "[externals] Download failed with ${RETVAL}")
     endif()
 endmacro()
