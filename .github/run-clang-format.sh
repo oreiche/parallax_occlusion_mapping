@@ -50,6 +50,11 @@ function run_clang_format() {
 
   mkdir -p "$EXEC_DIR"
 
+  if ! command -v clang-format &>/dev/null; then
+    echo "Error: Cannot find clang-format in PATH"
+    return 1
+  fi
+
   printf "Running clang-format on %s\n" "$SRC_DIR"
 
   local RETVAL=0 SRC_FILE
