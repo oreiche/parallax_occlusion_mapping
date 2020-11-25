@@ -15,12 +15,14 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install recent CMake
-        run: sh .github/install_cmake.sh /tmp/cmake
+      - name: Install dependencies
+        run: |
+          sh .github/install_dependencies.sh ~/.local
+          echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
 
         # get toolchain and external dependencies
       - name: Configure project
-        run: /tmp/cmake/bin/cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
+        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
 
       - name: Run clang-format
         run: bash .github/run-clang-format.sh cpp/ -v
@@ -33,12 +35,14 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install recent CMake
-        run: sh .github/install_cmake.sh /tmp/cmake
+      - name: Install dependencies
+        run: |
+          sh .github/install_dependencies.sh ~/.local
+          echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
 
         # get toolchain and external dependencies
       - name: Configure project
-        run: /tmp/cmake/bin/cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
+        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
 
       - name: Run clang-tidy
         run: bash .github/run-clang-tidy.sh cpp/ -v

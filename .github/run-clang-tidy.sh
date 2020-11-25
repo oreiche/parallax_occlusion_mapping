@@ -6,8 +6,10 @@ export PATH=".externals/llvm_toolchain/bin:$PATH"
 
 readonly CC_FLAGS=(
   "-std=c++17"
-  "-I."
+  "-DGLEW_NO_GLU"
   "-I.externals/github_gsl_lite/include"
+  "-I.externals/github_glew/include"
+  "-I.externals/github_glfw/include"
 )
 
 readonly STORAGE_DIR="${TMPDIR:-/tmp}/run-clang-tidy_$USER"
@@ -58,11 +60,16 @@ function collect_running_pids() {
 
 function parse_issues_from_log() {
   local LOG_FILE=$1
-  local FILE_FILTER=${2:-}
-  local PATTERN="$FILE_FILTER:[0-9]\+:[0-9]\+"
+  local FILE_FILTER=$2
+  local PATTERN="[0-9]\+:[0-9]\+"
+
+  # count all errors, also from file dependencies
   local NUM_ERRS=$(grep -c "$PATTERN:\ error:\ " "$LOG_FILE")
-  local NUM_WARNS=$(grep -c "$PATTERN:\ warning:\ " "$LOG_FILE")
-  local NUM_NOTES=$(grep -c "$PATTERN:\ note:\ " "$LOG_FILE")
+
+  # count only those warnings and notes that are directly related to the file
+  local NUM_WARNS=$(grep -c "$FILE_FILTER:$PATTERN:\ warning:\ " "$LOG_FILE")
+  local NUM_NOTES=$(grep -c "$FILE_FILTER:$PATTERN:\ note:\ " "$LOG_FILE")
+
   local NUM_TOTAL=$(($NUM_ERRS+$NUM_WARNS+$NUM_NOTES))
   echo $NUM_TOTAL
   if [ $NUM_TOTAL -gt 0 ]; then return 0; fi
@@ -80,7 +87,7 @@ function exec_clang_tidy() {
   if $FIX_ISSUES; then
     # fix issues in-place
     clang-tidy -fix-errors ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
-              2>/dev/null >"$LOG_DIR/$JOB_PID"
+              &>/dev/null || true
   else
     local CACHE_ENTRY=
 
@@ -96,7 +103,7 @@ function exec_clang_tidy() {
 
     # exec clang-tidy and store log for this job
     clang-tidy ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
-              2>/dev/null >"$LOG_DIR/$JOB_PID"
+              2>/dev/null >"$LOG_DIR/$JOB_PID" || true
 
     # if issues are related to this file (and not only to its dependencies)
     if parse_issues_from_log "$LOG_DIR/$JOB_PID" "$SRC_FILE" &>/dev/null; then
@@ -157,11 +164,8 @@ function run_clang_tidy() {
   mkdir -p "$LOG_DIR"
   mkdir -p "$CACHE_DIR"
 
-  if ! command -v clang &>/dev/null; then
-    echo "Error: Cannot find clang in PATH"
-    return 1
-  elif ! command -v clang-tidy &>/dev/null; then
-    echo "Error: Cannot find clang-tidy in PATH"
+  if (! command -v clang || ! command -v clang-tidy) &>/dev/null; then
+    echo "Error: Cannot find clang or clang-tidy in PATH"
     return 1
   fi
 

@@ -5,6 +5,7 @@
 
 # Parallax Occlusion Mapping
 ## Literature
+- [Basic OpenGL Tutorials](http://www.opengl-tutorial.org/beginners-tutorials)
 - [Practical Parallax Occlusion
 Mapping For Highly Detailed
 Surface Rendering](./doc/Parallax_Occlusion_Mapping.pdf)

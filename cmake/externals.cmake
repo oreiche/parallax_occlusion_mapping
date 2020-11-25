@@ -1,15 +1,29 @@
 cmake_minimum_required(VERSION 3.18)
 
 macro(setup_externals)
-    if (NOT EXTERNALS_STAGE_DIR)
-        set(EXTERNALS_STAGE_DIR "${CMAKE_BINARY_DIR}/externals")
-        file(MAKE_DIRECTORY "${EXTERNALS_STAGE_DIR}")
-        # Convenience link to stage directory from source directory
-        file(CREATE_LINK "${EXTERNALS_STAGE_DIR}"
-                        "${PROJECT_SOURCE_DIR}/.externals" SYMBOLIC)
+    set(EXTERNALS_ROOT_DIR "${CMAKE_BINARY_DIR}")
+    set(EXTERNALS_STAGE_NAME "externals")
+    set(EXTERNALS_FETCH_NAME "downloads")
+
+    if ("${CMAKE_PROJECT_NAME}" STREQUAL "CMAKE_TRY_COMPILE")
+        # Search for existing externals root directory in parent directories
+        while (NOT EXISTS "${EXTERNALS_ROOT_DIR}/${EXTERNALS_STAGE_NAME}")
+            get_filename_component(EXTERNALS_PARENT_DIR
+                                   "${EXTERNALS_ROOT_DIR}" DIRECTORY)
+            if ("${EXTERNALS_PARENT_DIR}" STREQUAL "${EXTERNALS_ROOT_DIR}")
+                message(FATAL_ERROR "Could not find externals root directory.")
+            endif()
+            set(EXTERNALS_ROOT_DIR "${EXTERNALS_PARENT_DIR}")
+        endwhile()
     endif()
+
+    if (NOT EXTERNALS_STAGE_DIR)
+        set(EXTERNALS_STAGE_DIR "${EXTERNALS_ROOT_DIR}/${EXTERNALS_STAGE_NAME}")
+        file(MAKE_DIRECTORY "${EXTERNALS_STAGE_DIR}")
+    endif()
+
     if (NOT EXTERNALS_FETCH_DIR)
-        set(EXTERNALS_FETCH_DIR "${CMAKE_BINARY_DIR}/downloads")
+        set(EXTERNALS_FETCH_DIR "${EXTERNALS_ROOT_DIR}/${EXTERNALS_FETCH_NAME}")
         file(MAKE_DIRECTORY "${EXTERNALS_FETCH_DIR}")
     endif()
 endmacro()
@@ -33,8 +47,11 @@ macro(http_archive)
          "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if (NOT HTTP_ARCHIVE_NAME OR NOT HTTP_ARCHIVE_URL)
-        message(FATAL_ERROR "Missing mandatory argument")
+        message(FATAL_ERROR "[externals] Missing mandatory argument")
     endif()
+
+    unset(DOWNLOAD_EXTRA_ARGS)
+    unset(EXTRACT_EXTRA_ARGS)
 
     if (HTTP_ARCHIVE_SHA256)
         set(DOWNLOAD_EXTRA_ARGS ${DOWNLOAD_EXTRA_ARGS}
@@ -57,7 +74,7 @@ macro(http_archive)
     set(EXTRACT_PATH "${EXTERNALS_FETCH_DIR}/${HTTP_ARCHIVE_NAME}")
     set(STAGE_PATH "${EXTERNALS_STAGE_DIR}/${HTTP_ARCHIVE_NAME}")
 
-    message(STATUS "Downloading external ${HTTP_ARCHIVE_NAME}")
+    message(STATUS "[externals] Downloading ${HTTP_ARCHIVE_NAME}")
 
     file(DOWNLOAD "${HTTP_ARCHIVE_URL}"
         ${DOWNLOAD_FILE}
@@ -70,8 +87,8 @@ macro(http_archive)
         # Download call successful, file might have existed before
         if ("${EXIT_MESSAGE}" STREQUAL "\"No error\""
             OR NOT EXISTS "${STAGE_PATH}")
-            # New file was successfully downloaded
-            message(STATUS "Extracting external ${HTTP_ARCHIVE_NAME}")
+            # New file was s[uccessfully downloaded
+            message(STATUS "[externals] Extracting ${HTTP_ARCHIVE_NAME}")
             file(ARCHIVE_EXTRACT
                 INPUT "${DOWNLOAD_FILE}"
                 DESTINATION "${EXTRACT_PATH}"
@@ -81,10 +98,10 @@ macro(http_archive)
                         "${STAGE_PATH}")
             file(REMOVE_RECURSE "${EXTRACT_PATH}")
         else()
-            message(STATUS "External ${HTTP_ARCHIVE_NAME} is up to date")
+            message(STATUS "[externals] ${HTTP_ARCHIVE_NAME} is up to date")
         endif()
         set(${HTTP_ARCHIVE_NAME}_ROOT "${STAGE_PATH}")
     else()
-        message(FATAL_ERROR "Failed to download ${HTTP_ARCHIVE_NAME} with ${RETVAL}")
+        message(FATAL_ERROR "[externals] Download failed with ${RETVAL}")
     endif()
 endmacro()

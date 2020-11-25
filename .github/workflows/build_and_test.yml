@@ -15,17 +15,19 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install recent CMake
-        run: sh .github/install_cmake.sh /tmp/cmake
+      - name: Install dependencies
+        run: |
+          sh .github/install_dependencies.sh ~/.local
+          echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
 
       - name: Configure project
-        run: /tmp/cmake/bin/cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Release
 
       - name: Build project
-        run: /tmp/cmake/bin/cmake --build .build
+        run: cmake --build .build -j
 
       #- name: Tests and Memcheck
-      #  run: /tmp/cmake/bin/ctest ...
+      #  run: ctest ...
 
   linux_debug:
     name: Linux Debug
@@ -35,14 +37,16 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Install recent CMake
-        run: sh .github/install_cmake.sh /tmp/cmake
+      - name: Install dependencies
+        run: |
+          sh .github/install_dependencies.sh ~/.local
+          echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
 
       - name: Configure project
-        run: /tmp/cmake/bin/cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Debug
+        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Debug
 
       - name: Build project
-        run: /tmp/cmake/bin/cmake --build .build
+        run: cmake --build .build -j
 
       #- name: Test and Memcheck
-      #  run: /tmp/cmake/bin/ctest ...
+      #  run: ctest ...
