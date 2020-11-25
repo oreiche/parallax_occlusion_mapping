@@ -1,15 +1,32 @@
 cmake_minimum_required(VERSION 3.18)
 
 macro(setup_externals)
+    set(EXTERNALS_ROOT_DIR "${CMAKE_BINARY_DIR}")
+    set(EXTERNALS_STAGE_NAME "externals")
+    set(EXTERNALS_FETCH_NAME "downloads")
+
+    if ("${CMAKE_PROJECT_NAME}" STREQUAL "CMAKE_TRY_COMPILE")
+        # Search for existing externals root directory in parent directories
+        while (NOT EXISTS "${EXTERNALS_ROOT_DIR}/${EXTERNALS_STAGE_NAME}")
+            get_filename_component(EXTERNALS_PARENT_DIR
+                                   "${EXTERNALS_ROOT_DIR}" DIRECTORY)
+            if ("${EXTERNALS_PARENT_DIR}" STREQUAL "${EXTERNALS_ROOT_DIR}")
+                message(FATAL_ERROR "Could not find externals root directory.")
+            endif()
+            set(EXTERNALS_ROOT_DIR "${EXTERNALS_PARENT_DIR}")
+        endwhile()
+    endif()
+
     if (NOT EXTERNALS_STAGE_DIR)
-        set(EXTERNALS_STAGE_DIR "${CMAKE_BINARY_DIR}/externals")
+        set(EXTERNALS_STAGE_DIR "${EXTERNALS_ROOT_DIR}/${EXTERNALS_STAGE_NAME}")
         file(MAKE_DIRECTORY "${EXTERNALS_STAGE_DIR}")
         # Convenience link to stage directory from source directory
         file(CREATE_LINK "${EXTERNALS_STAGE_DIR}"
                         "${PROJECT_SOURCE_DIR}/.externals" SYMBOLIC)
     endif()
+
     if (NOT EXTERNALS_FETCH_DIR)
-        set(EXTERNALS_FETCH_DIR "${CMAKE_BINARY_DIR}/downloads")
+        set(EXTERNALS_FETCH_DIR "${EXTERNALS_ROOT_DIR}/${EXTERNALS_FETCH_NAME}")
         file(MAKE_DIRECTORY "${EXTERNALS_FETCH_DIR}")
     endif()
 endmacro()
