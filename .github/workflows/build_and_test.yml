@@ -22,7 +22,7 @@ jobs:
         run: /tmp/cmake/bin/cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Release
 
       - name: Build project
-        run: /tmp/cmake/bin/cmake --build .build
+        run: /tmp/cmake/bin/cmake --build .build -j
 
       #- name: Tests and Memcheck
       #  run: /tmp/cmake/bin/ctest ...
@@ -42,7 +42,7 @@ jobs:
         run: /tmp/cmake/bin/cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Debug
 
       - name: Build project
-        run: /tmp/cmake/bin/cmake --build .build
+        run: /tmp/cmake/bin/cmake --build .build -j
 
       #- name: Test and Memcheck
       #  run: /tmp/cmake/bin/ctest ...
