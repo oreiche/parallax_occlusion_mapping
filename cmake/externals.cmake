@@ -20,9 +20,6 @@ macro(setup_externals)
     if (NOT EXTERNALS_STAGE_DIR)
         set(EXTERNALS_STAGE_DIR "${EXTERNALS_ROOT_DIR}/${EXTERNALS_STAGE_NAME}")
         file(MAKE_DIRECTORY "${EXTERNALS_STAGE_DIR}")
-        # Convenience link to stage directory from source directory
-        file(CREATE_LINK "${EXTERNALS_STAGE_DIR}"
-                        "${PROJECT_SOURCE_DIR}/.externals" SYMBOLIC)
     endif()
 
     if (NOT EXTERNALS_FETCH_DIR)
