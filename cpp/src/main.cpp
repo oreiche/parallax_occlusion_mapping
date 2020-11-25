@@ -4,6 +4,8 @@
 #include "GLFW/glfw3.h"
 #include "gsl/gsl-lite.hpp"
 
+void processInput(GLFWwindow* window);
+
 auto main() -> int {
   static constexpr auto kWidth = 1024;
   static constexpr auto kHeight = 768;
@@ -43,6 +45,7 @@ auto main() -> int {
   glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
   do {
+    processInput(window);
     // Clear the screen. It's not mentioned before Tutorial 02, but it can cause
     // flickering, so it's there nonetheless.
     glClear(GL_COLOR_BUFFER_BIT);
@@ -54,8 +57,11 @@ auto main() -> int {
     glfwPollEvents();
 
   }  // Check if the ESC key was pressed or the window was closed
-  while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-         glfwWindowShouldClose(window) == 0);
+  while (glfwWindowShouldClose(window) == 0);
 
   return 0;
+}
+void processInput(GLFWwindow* window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
 }
