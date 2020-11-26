@@ -14,10 +14,11 @@ if (NOT WIN32)
     file(CREATE_LINK "${EXTERNALS_STAGE_DIR}"
                      "${PROJECT_SOURCE_DIR}/.externals" SYMBOLIC)
 else()
-    message(NOTICE
-            "For convenience, you might want to symlink externals to your "
-            "source dir via:\n    mklink /d '${PROJECT_SOURCE_DIR}/.externals' "
-            "'${EXTERNALS_STAGE_DIR}'")
+    file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR}/.externals LINK_PATH)
+    file(TO_NATIVE_PATH ${EXTERNALS_STAGE_DIR} TARGET_PATH)
+    message(NOTICE "For convenience, you might want to symlink externals to "
+                   "your source dir via:\n"
+                   "    mklink /d ${LINK_PATH} ${TARGET_PATH}")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
