@@ -21,12 +21,12 @@ else()
                    "    mklink /d ${LINK_PATH} ${TARGET_PATH}")
 endif()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR
-    CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    add_compile_options(-std=c++17
-                        -Wall -Wextra -Wsign-conversion -Werror -pedantic)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    add_compile_options(/std:c++17 /W4 /WX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if (MSVC)
+    add_compile_options(/W4 /WX)
+else()
+    add_compile_options(-Wall -Wextra -Wsign-conversion -Werror -pedantic)
 endif()
 
 add_subdirectory(cpp)
