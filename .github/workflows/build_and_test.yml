@@ -1,52 +1,83 @@
 name: Build and Test
 
 on:
-  pull_request:
   push:
-    branches:
-      - master
 
 jobs:
-  linux_release:
-    name: Linux Release
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
+    linux_release:
+      name: Linux Release
+      if: "!contains(github.event.head_commit.message, '[skip ci]')"
+      runs-on: ubuntu-20.04
+      steps:
+        - name: Checkout sources
+          uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: |
-          sh .github/install_dependencies.sh ~/.local
-          echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
+        - name: Install dependencies
+          run: |
+            sh .github/install_dependencies.sh ~/.local
+            echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Configure project
-        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Release
+        - name: Configure project
+          run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build project
-        run: cmake --build .build -j
+        - name: Build project
+          run: cmake --build .build -j
 
-      #- name: Tests and Memcheck
-      #  run: ctest ...
+        #- name: Tests and Memcheck
+        #  run: ctest ...
 
-  linux_debug:
-    name: Linux Debug
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
+    linux_debug:
+      name: Linux Debug
+      if: "!contains(github.event.head_commit.message, '[skip ci]')"
+      runs-on: ubuntu-20.04
+      steps:
+        - name: Checkout sources
+          uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: |
-          sh .github/install_dependencies.sh ~/.local
-          echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
+        - name: Install dependencies
+          run: |
+            sh .github/install_dependencies.sh ~/.local
+            echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
 
-      - name: Configure project
-        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Debug
+        - name: Configure project
+          run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Debug
 
-      - name: Build project
-        run: cmake --build .build -j
+        - name: Build project
+          run: cmake --build .build -j
 
-      #- name: Test and Memcheck
-      #  run: ctest ...
+        #- name: Test and Memcheck
+        #  run: ctest ...
+
+    windows_release:
+      name: Windows Release
+      if: "!contains(github.event.head_commit.message, '[skip ci]')"
+      runs-on: windows-2019
+      steps:
+        - name: Checkout sources
+          uses: actions/checkout@v2
+
+        - name: Configure project
+          run: cmake -S . -B .build
+
+        - name: Build project
+          run: cmake --build .build --config Release -j
+
+        #- name: Tests and Memcheck
+        #  run: ctest -C Release ...
+
+    windows_debug:
+      name: Windows Debug
+      if: "!contains(github.event.head_commit.message, '[skip ci]')"
+      runs-on: windows-2019
+      steps:
+        - name: Checkout sources
+          uses: actions/checkout@v2
+
+        - name: Configure project
+          run: cmake -S . -B .build
+
+        - name: Build project
+          run: cmake --build .build --config Debug -j
+
+        #- name: Tests and Memcheck
+        #  run: ctest -C Debug ...

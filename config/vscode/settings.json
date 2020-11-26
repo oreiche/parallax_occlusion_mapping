@@ -1,6 +1,7 @@
 {
-    "clang-format.executable": ".externals/llvm_toolchain/bin/clang-format",
-    "clang-tidy.executable": ".externals/llvm_toolchain/bin/clang-tidy",
+    // use clang from external toolchain
+    //"clang-format.executable": ".externals/llvm_toolchain/bin/clang-format",
+    //"clang-tidy.executable": ".externals/llvm_toolchain/bin/clang-tidy",
     "clang-tidy.compilerArgs": [
         "-std=c++17",
         "-DGLEW_NO_GLU",
