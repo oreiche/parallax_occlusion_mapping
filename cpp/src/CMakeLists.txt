@@ -1,2 +1,0 @@
-add_executable(pom_cpp main.cpp)
-target_link_libraries(pom_cpp github_gsl_lite github_glew github_glfw)

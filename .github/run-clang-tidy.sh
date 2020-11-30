@@ -7,6 +7,7 @@ export PATH=".externals/llvm_toolchain/bin:$PATH"
 readonly CC_FLAGS=(
   "-std=c++17"
   "-DGLEW_NO_GLU"
+  "-I."
   "-I.externals/github_gsl_lite/include"
   "-I.externals/github_glew/include"
   "-I.externals/github_glfw/include"
