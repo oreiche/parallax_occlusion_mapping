@@ -27,8 +27,8 @@ class Renderer {
  private:
   static constexpr auto kWidth = 1024;
   static constexpr auto kHeight = 768;
-  std::string name_;
-  gsl::owner<GLFWwindow*> window_{};
+  std::string name_{};
+  GLFWwindow* window_{};
 
   [[nodiscard]] auto Initialize() noexcept -> bool;
 };
