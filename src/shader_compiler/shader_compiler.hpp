@@ -2,6 +2,7 @@
 #define SRC_SHADER_COMPILER_SHADER_COMPILER_HPP
 
 #include <filesystem>
+#include <optional>
 #include <string>
 
 #include "GL/glew.h"
@@ -10,14 +11,13 @@ class ShaderCompiler {
  public:
   ShaderCompiler(std::string vertex_shader,
                  std::string fragment_shader) noexcept
-      : vertex_shader_{std::move(vertex_shader)},
+      : initialized_{true},
+        vertex_shader_{std::move(vertex_shader)},
         fragment_shader_{std::move(fragment_shader)} {}
 
   ShaderCompiler(std::filesystem::path const& vertex_file_path,
                  std::filesystem::path const& fragment_file_path) noexcept {
-    if (!LoadShaderFromFile(vertex_file_path, fragment_file_path)) {
-      std::exit(EXIT_FAILURE);
-    }
+    initialized_ = LoadShaderFromFile(vertex_file_path, fragment_file_path);
   }
 
   ShaderCompiler(ShaderCompiler const&) noexcept = delete;
@@ -26,9 +26,13 @@ class ShaderCompiler {
   auto operator=(ShaderCompiler&&) noexcept -> ShaderCompiler& = delete;
   ~ShaderCompiler() noexcept = default;
 
-  [[nodiscard]] auto Compile() && noexcept -> GLuint;
+  [[nodiscard]] auto Compile() && noexcept -> std::optional<GLuint>;
+  [[nodiscard]] auto IsInitialized() const noexcept -> bool {
+    return initialized_;
+  }
 
  private:
+  bool initialized_{};
   std::string vertex_shader_{};
   std::string fragment_shader_{};
 

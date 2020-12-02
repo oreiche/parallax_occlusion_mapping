@@ -9,10 +9,10 @@
 
 class Renderer {
  public:
+  using DrawCallback = std::function<bool()>;
+
   explicit Renderer(std::string name) noexcept : name_{std::move(name)} {
-    if (!Initialize()) {
-      std::exit(EXIT_FAILURE);
-    }
+    initialized_ = Initialize();
   }
   Renderer(Renderer const&) noexcept = delete;
   Renderer(Renderer&&) noexcept = delete;
@@ -20,15 +20,17 @@ class Renderer {
   auto operator=(Renderer const&) noexcept -> Renderer& = delete;
   auto operator=(Renderer&&) noexcept -> Renderer& = default;
 
-  [[nodiscard]] auto Run(GLuint program_id,
-                         std::function<void()> const& draw_call) noexcept
-      -> bool;
+  void SetExitKeyCode(int keycode) noexcept { exit_keycode_ = keycode; }
+
+  [[nodiscard]] auto Run(DrawCallback const& draw_call) noexcept -> bool;
 
  private:
   static constexpr auto kWidth = 1024;
   static constexpr auto kHeight = 768;
+  bool initialized_{};
   std::string name_{};
   GLFWwindow* window_{};
+  int exit_keycode_{GLFW_KEY_ESCAPE};
 
   [[nodiscard]] auto Initialize() noexcept -> bool;
 };

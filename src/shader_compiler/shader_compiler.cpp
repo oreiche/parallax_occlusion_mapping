@@ -6,7 +6,11 @@
 
 #include "gsl/gsl-lite.hpp"
 
-auto ShaderCompiler::Compile() && noexcept -> GLuint {
+auto ShaderCompiler::Compile() && noexcept -> std::optional<GLuint> {
+  if (!IsInitialized()) {
+    return std::nullopt;
+  }
+
   // Create the shaders
   GLuint vertex_id{glCreateShader(GL_VERTEX_SHADER)};
   GLuint fragment_id{glCreateShader(GL_FRAGMENT_SHADER)};
@@ -28,6 +32,9 @@ auto ShaderCompiler::Compile() && noexcept -> GLuint {
     glGetShaderInfoLog(vertex_id, msg_length, nullptr, error_msg.data());
     std::cerr << error_msg.c_str() << std::endl;
   }
+  if (result == GL_FALSE) {
+    return std::nullopt;
+  }
 
   // Compile Fragment Shader
   std::cout << "Compiling fragment shader" << std::endl;
@@ -42,6 +49,9 @@ auto ShaderCompiler::Compile() && noexcept -> GLuint {
     std::string error_msg{"\0", gsl::narrow<std::size_t>(msg_length + 1)};
     glGetShaderInfoLog(fragment_id, msg_length, nullptr, error_msg.data());
     std::cerr << error_msg.c_str() << std::endl;
+  }
+  if (result == GL_FALSE) {
+    return std::nullopt;
   }
 
   // Link the program
@@ -58,6 +68,9 @@ auto ShaderCompiler::Compile() && noexcept -> GLuint {
     std::string error_msg{"\0", gsl::narrow<std::size_t>(msg_length + 1)};
     glGetProgramInfoLog(program_id, msg_length, nullptr, error_msg.data());
     std::cerr << error_msg.c_str() << std::endl;
+  }
+  if (result == GL_FALSE) {
+    return std::nullopt;
   }
 
   glDetachShader(program_id, vertex_id);

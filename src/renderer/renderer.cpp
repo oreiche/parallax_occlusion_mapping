@@ -41,8 +41,9 @@ auto Renderer::Initialize() noexcept -> bool {
   return true;
 }
 
-auto Renderer::Run(GLuint program_id,
-                   std::function<void()> const& draw_call) noexcept -> bool {
+auto Renderer::Run(DrawCallback const& draw_call) noexcept -> bool {
+  bool continue_drawing{true};
+
   glClearColor(0.0F, 0.0F, 0.4F, 0.0F);  // NOLINT
 
   do {
@@ -50,18 +51,15 @@ auto Renderer::Run(GLuint program_id,
     // cause flickering, so it's there nonetheless.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // NOLINT
 
-    // Use our shader
-    glUseProgram(program_id);
-
     // Draw
-    draw_call();
+    continue_drawing = draw_call();
 
     // Swap buffers
     glfwSwapBuffers(window_);
     glfwPollEvents();
 
   }  // Check if the ESC key was pressed or the window was closed
-  while (glfwGetKey(window_, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+  while (continue_drawing && glfwGetKey(window_, exit_keycode_) != GLFW_PRESS &&
          glfwWindowShouldClose(window_) == 0);
 
   return true;
