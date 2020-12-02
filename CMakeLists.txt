@@ -1,13 +1,17 @@
 cmake_minimum_required(VERSION 3.18)
 project(ParallaxOcclusionMapping CXX)
+enable_testing()
 
 if (CMAKE_TOOLCHAIN_FILE)
     message(STATUS "Using toolchain file: ${CMAKE_TOOLCHAIN_FILE}")
 endif()
 
-include(cmake/external/gsl_lite.cmake)
-include(cmake/external/glew.cmake)
-include(cmake/external/glfw.cmake)
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+include(externals)
+include(external/gsl_lite)
+include(external/catch2)
+include(external/glew)
+include(external/glfw)
 
 if (NOT WIN32)
     # Convenience symlink to stage directory from source directory
