@@ -52,24 +52,34 @@ void main() { \
   auto program_id =
       ShaderCompiler{vertex_shader_code, fragment_shader_code}.Compile();
 
-  auto success = renderer.Run(program_id, [&] {
-    // 1st attribute buffer : vertices
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glVertexAttribPointer(0,         // attribute 0. No particular reason for 0,
-                                     // but must match the layout in the shader.
-                          3,         // size
-                          GL_FLOAT,  // type
-                          GL_FALSE,  // normalized?
-                          0,         // stride
-                          nullptr    // array buffer offset
-    );
+  if (program_id) {
+    auto render_status = renderer.Run([&] {
+      // Use our shader
+      glUseProgram(*program_id);
 
-    // Draw the triangle !
-    glDrawArrays(GL_TRIANGLES, 0,
-                 3);  // Starting from vertex 0; 3 vertices total -> 1 triangle
-    glDisableVertexAttribArray(0);
-  });
+      // 1st attribute buffer : vertices
+      glEnableVertexAttribArray(0);
+      glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+      glVertexAttribPointer(0,  // attribute 0. No particular reason for 0,
+                                // but must match the layout in the shader.
+                            3,  // size
+                            GL_FLOAT,  // type
+                            GL_FALSE,  // normalized?
+                            0,         // stride
+                            nullptr    // array buffer offset
+      );
 
-  return success ? 0 : -1;
+      // Draw the triangle !
+      glDrawArrays(
+          GL_TRIANGLES, 0,
+          3);  // Starting from vertex 0; 3 vertices total -> 1 triangle
+      glDisableVertexAttribArray(0);
+
+      return true;  // Run forever
+    });
+
+    return (render_status ? EXIT_SUCCESS : EXIT_FAILURE);
+  }
+
+  return EXIT_FAILURE;
 }

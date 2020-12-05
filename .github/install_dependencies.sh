@@ -8,7 +8,7 @@ readonly CMAKE_INSTALLER="https://github.com/Kitware/CMake/releases/download/v3.
 sudo apt update
 sudo apt install -y --no-install-recommends \
     libopengl-dev libglx-dev libxinerama-dev libxrandr-dev libxcursor-dev \
-    libxi-dev libgl1-mesa-dev
+    libxi-dev libgl1-mesa-dev valgrind
 
 mkdir -p "$INSTALL_PREFIX"
 cd "$INSTALL_PREFIX"

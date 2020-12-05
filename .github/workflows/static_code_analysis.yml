@@ -22,7 +22,7 @@ jobs:
         run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
 
       - name: Run clang-format
-        run: bash .github/run-clang-format.sh cpp/ -v
+        run: cd .build; ctest --output-on-failure -R code_analysis_clang-format
 
   clang-tidy:
     name: Clang Tidy
@@ -42,4 +42,4 @@ jobs:
         run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
 
       - name: Run clang-tidy
-        run: bash .github/run-clang-tidy.sh cpp/ -v
+        run: cd .build; ctest --output-on-failure -R code_analysis_clang-tidy

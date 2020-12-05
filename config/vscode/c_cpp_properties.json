@@ -5,11 +5,13 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/.externals/github_gsl_lite/include",
+                "${workspaceFolder}/.externals/github_catch2/single_include",
                 "${workspaceFolder}/.externals/github_glew/include",
                 "${workspaceFolder}/.externals/github_glfw/include"
             ],
             "defines": [
-                "GLEW_NO_GLU"
+                "GLEW_NO_GLU",
+                "WITH_OPENGL"
             ],
             "compilerPath": "${workspaceFolder}/.externals/llvm_toolchain/bin/clang",
             "cStandard": "c11",
@@ -21,11 +23,13 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/.externals/github_gsl_lite/include",
+                "${workspaceFolder}/.externals/github_catch2/single_include",
                 "${workspaceFolder}/.externals/github_glew/include",
                 "${workspaceFolder}/.externals/github_glfw/include"
             ],
             "defines": [
-                "GLEW_NO_GLU"
+                "GLEW_NO_GLU",
+                "WITH_OPENGL"
             ],
             "cStandard": "c11",
             "cppStandard": "c++17"

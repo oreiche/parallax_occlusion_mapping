@@ -1,6 +1,3 @@
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-include(externals)
-
 # Get GLEW from GitHub
 http_archive(
     NAME    github_glew
