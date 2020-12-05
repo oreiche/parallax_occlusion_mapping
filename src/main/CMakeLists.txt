@@ -1,2 +1,2 @@
 add_executable(pom_main main.cpp)
-target_link_libraries(pom_main github_glew shader_compiler renderer)
+target_link_libraries(pom_main github_glew github_glm shader_compiler renderer)

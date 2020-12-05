@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "GL/glew.h"
+#include "glm/gtc/matrix_transform.hpp"
 #include "src/renderer/renderer.hpp"
 #include "src/shader_compiler/shader_compiler.hpp"
 
@@ -36,9 +37,9 @@ auto main() -> int {
   std::string vertex_shader_code =
       "#version 330 core\n \
 layout(location = 0) in vec3 vertexPosition_modelspace; \
+uniform mat4 MVP; \
 void main() { \
-  gl_Position.xyz = vertexPosition_modelspace; \
-  gl_Position.w = 1.0; \
+  gl_Position = MVP * vec4(vertexPosition_modelspace, 1.0); \
 }";
 
   std::string fragment_shader_code =
@@ -53,6 +54,32 @@ void main() { \
       ShaderCompiler{vertex_shader_code, fragment_shader_code}.Compile();
 
   if (program_id) {
+    static constexpr auto kFoV = glm::radians(45.0F);
+    static constexpr auto kAspectRatio = 16.0F / 9;
+    static constexpr auto kClipNear = 0.1F;
+    static constexpr auto kClipFar = 100.0F;
+
+    // model matrix
+    auto model_matrix =
+        glm::translate(glm::mat4{1.0F},               // identity matrix
+                       glm::vec3(0.0F, 0.0F, 0.0F));  // translation vector
+
+    // view matrix
+    auto view_matrix = glm::lookAt(
+        glm::vec3(1.0F, 1.0F, 5.0F),   // camera position NOLINT
+        glm::vec3(0.0F, 0.0F, 0.0F),   // camera target
+        glm::vec3(0.0F, 1.0F, 0.0F));  // vector defining camera 'up'
+
+    // projection matrix
+    auto projection_matrix =
+        glm::perspective(kFoV, kAspectRatio, kClipNear, kClipFar);
+
+    // accumulated mode view projection matrix
+    auto mvp_matrix = projection_matrix * view_matrix * model_matrix;
+
+    // handle to 'MVP' uniform in vertex shader
+    auto mvp_id = glGetUniformLocation(*program_id, "MVP");
+
     auto render_status = renderer.Run([&] {
       // Use our shader
       glUseProgram(*program_id);
@@ -68,6 +95,9 @@ void main() { \
                             0,         // stride
                             nullptr    // array buffer offset
       );
+
+      // upload model view projection matrix
+      glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &mvp_matrix[0][0]);
 
       // Draw the triangle !
       glDrawArrays(

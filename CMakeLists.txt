@@ -12,6 +12,7 @@ include(external/gsl_lite)
 include(external/catch2)
 include(external/glew)
 include(external/glfw)
+include(external/glm)
 
 if (NOT WIN32)
     # Convenience symlink to stage directory from source directory
