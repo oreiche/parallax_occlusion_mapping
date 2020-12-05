@@ -38,10 +38,5 @@ macro (add_memchk_test TEST_NAME TEST_TARGET)
     endif ()
 endmacro ()
 
-# Main for all tests
-add_library(test_main test_main.cpp)
-target_link_libraries(test_main PUBLIC github_catch2 github_glew github_glfw)
-
-# Tests
-add_subdirectory(shader_compiler)
-add_subdirectory(renderer)
+add_subdirectory(utils)
+add_subdirectory(pom)

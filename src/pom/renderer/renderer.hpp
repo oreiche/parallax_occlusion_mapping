@@ -1,5 +1,5 @@
-#ifndef SRC_RENDERER_RENDERER_COMPILER_HPP
-#define SRC_RENDERER_RENDERER_COMPILER_HPP
+#ifndef SRC_POM_RENDERER_RENDERER_HPP
+#define SRC_POM_RENDERER_RENDERER_HPP
 
 #include <functional>
 
@@ -35,4 +35,4 @@ class Renderer {
   [[nodiscard]] auto Initialize() noexcept -> bool;
 };
 
-#endif  // SRC_RENDERER_RENDERER_COMPILER_HPP
+#endif  // SRC_POM_RENDERER_RENDERER_HPP

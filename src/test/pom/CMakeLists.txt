@@ -1,0 +1,2 @@
+add_subdirectory(renderer)
+add_subdirectory(shader_compiler)

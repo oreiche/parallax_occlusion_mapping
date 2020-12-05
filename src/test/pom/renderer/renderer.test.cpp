@@ -1,5 +1,5 @@
 #include "catch2/catch.hpp"
-#include "src/renderer/renderer.hpp"
+#include "src/pom/renderer/renderer.hpp"
 
 #ifdef WITH_OPENGL
 

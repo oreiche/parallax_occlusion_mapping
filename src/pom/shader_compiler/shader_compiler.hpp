@@ -1,5 +1,5 @@
-#ifndef SRC_SHADER_COMPILER_SHADER_COMPILER_HPP
-#define SRC_SHADER_COMPILER_SHADER_COMPILER_HPP
+#ifndef SRC_POM_SHADER_COMPILER_SHADER_COMPILER_HPP
+#define SRC_POM_SHADER_COMPILER_SHADER_COMPILER_HPP
 
 #include <filesystem>
 #include <optional>
@@ -41,4 +41,4 @@ class ShaderCompiler {
       std::filesystem::path const& fragment_file_path) noexcept -> bool;
 };
 
-#endif  // SRC_SHADER_COMPILER_SHADER_COMPILER_HPP
+#endif  // SRC_POM_SHADER_COMPILER_SHADER_COMPILER_HPP
