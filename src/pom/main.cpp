@@ -7,8 +7,8 @@
 
 #include "GL/glew.h"
 #include "glm/gtc/matrix_transform.hpp"
-#include "src/renderer/renderer.hpp"
-#include "src/shader_compiler/shader_compiler.hpp"
+#include "src/pom/renderer/renderer.hpp"
+#include "src/pom/shader_compiler/shader_compiler.hpp"
 
 auto main() -> int {
   Renderer renderer{"Tutorial"};
