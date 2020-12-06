@@ -12,6 +12,9 @@ readonly CC_FLAGS=(
   "-I.externals/github_glew/include"
   "-I.externals/github_glfw/include"
   "-I.externals/github_glm"
+  "-I.externals/github_sail/include"
+  "-I.externals/github_freeimage/Source"
+  "-I.externals/github_freeimage/Wrapper/FreeImagePlus"
 )
 
 readonly CLANG=clang${WIN32_EXT:-}

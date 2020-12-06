@@ -13,6 +13,7 @@ include(external/catch2)
 include(external/glew)
 include(external/glfw)
 include(external/glm)
+include(external/freeimage)
 
 if (NOT WIN32)
     # Convenience symlink to externals stage directory from source directory
