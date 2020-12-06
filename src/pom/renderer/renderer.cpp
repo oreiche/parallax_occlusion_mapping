@@ -44,6 +44,11 @@ auto Renderer::Initialize() noexcept -> bool {
 auto Renderer::Run(DrawCallback const& draw_call) noexcept -> bool {
   bool continue_drawing{true};
 
+  // Enable depth test
+  glEnable(GL_DEPTH_TEST);
+  // Accept fragment if it closer to the camera than the former one
+  glDepthFunc(GL_LESS);
+
   glClearColor(0.0F, 0.0F, 0.4F, 0.0F);  // NOLINT
 
   do {
