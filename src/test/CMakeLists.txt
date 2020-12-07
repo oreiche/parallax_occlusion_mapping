@@ -35,12 +35,12 @@ endif()
 macro (add_memchk_test TEST_NAME TEST_TARGET)
     add_test(NAME ${TEST_NAME}
              COMMAND $<TARGET_FILE:${TEST_TARGET}> ${ARGN}
-             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     if (CXX_MEMCHECK)
         add_test(NAME ${TEST_NAME}_memchk
                  COMMAND ${CXX_MEMCHECK} ${CXX_MEMCHECK_OPTIONS}
                          $<TARGET_FILE:${TEST_TARGET}> ${ARGN}
-                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
     endif ()
 endmacro ()
 
