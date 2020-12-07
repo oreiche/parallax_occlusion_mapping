@@ -14,6 +14,7 @@ readonly CC_FLAGS=(
   "-I.externals/github_glew/include"
   "-I.externals/github_glfw/include"
   "-I.externals/github_glm"
+  "-I.externals/github_sail/include"
 )
 
 readonly STORAGE_DIR="${TMPDIR:-/tmp}/run-clang-tidy_$USER"

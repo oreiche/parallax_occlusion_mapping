@@ -7,10 +7,22 @@
 
 #include "GL/glew.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "sail-c++/sail-c++.h"
+#include "src/pom/common/common.hpp"
 #include "src/pom/renderer/renderer.hpp"
 #include "src/pom/shader_compiler/shader_compiler.hpp"
 
 auto main() -> int {
+  if (!SetSailCodecsPath()) {
+    std::cerr << "Failed to set sail codecs path" << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  sail::image_reader img_reader{};
+  sail::image img{};
+
+  img_reader.read("img/checkerboard.png", &img);
+
   Renderer renderer{"Tutorial"};
 
   GLuint VertexArrayID{};

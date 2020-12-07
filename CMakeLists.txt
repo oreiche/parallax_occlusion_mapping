@@ -13,6 +13,7 @@ include(external/catch2)
 include(external/glew)
 include(external/glfw)
 include(external/glm)
+include(external/sail)
 
 if (NOT WIN32)
     # Convenience symlink to stage directory from source directory
