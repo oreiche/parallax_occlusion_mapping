@@ -5,17 +5,15 @@
 #include <string>
 #include <vector>
 
-#include "FreeImagePlus.h"
 #include "GL/glew.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "src/pom/image_loader/image_loader.hpp"
 #include "src/pom/renderer/renderer.hpp"
 #include "src/pom/shader_compiler/shader_compiler.hpp"
 
 auto main() -> int {
-  FreeImage_Initialise();
-
-  fipImage image{};
-  if (image.load("img/checkerboard.png") != TRUE) {
+  ImageLoader img{};
+  if (!img.load("img/checkerboard.png")) {
     std::cerr << "Could not load image img/checkerboard.png" << std::endl;
     return EXIT_FAILURE;
   }
