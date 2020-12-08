@@ -19,7 +19,7 @@ jobs:
 
         # get toolchain and external dependencies
       - name: Configure project
-        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
+        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DRUN_ANALYSIS=ON
 
       - name: Run clang-format
         run: cd .build; ctest --output-on-failure -R code_analysis_clang-format
@@ -39,7 +39,7 @@ jobs:
 
         # get toolchain and external dependencies
       - name: Configure project
-        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
+        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DRUN_ANALYSIS=ON
 
       - name: Run clang-tidy
         run: cd .build; ctest --output-on-failure -R code_analysis_clang-tidy

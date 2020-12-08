@@ -18,7 +18,7 @@ jobs:
             echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
 
         - name: Configure project
-          run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Release -DOPENGL_TESTS=OFF -DRUN_ANALYSIS=OFF
+          run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Release -DOPENGL_TESTS=OFF
 
         - name: Build project
           run: cmake --build .build -j
@@ -40,7 +40,7 @@ jobs:
             echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
 
         - name: Configure project
-          run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Debug -DOPENGL_TESTS=OFF -DRUN_ANALYSIS=OFF
+          run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Debug -DOPENGL_TESTS=OFF
 
         - name: Build project
           run: cmake --build .build -j
