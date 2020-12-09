@@ -2,14 +2,14 @@
 
 set -euo pipefail
 
-export PATH=".externals/llvm_toolchain/bin:$PATH"
+readonly CLANG_FORMAT=clang-format${WIN32_EXT:-}
 
 readonly STORAGE_DIR="${TMPDIR:-/tmp}/run-clang-format_$USER"
 readonly EXEC_DIR="$STORAGE_DIR/exec.$$"
 
 function usage() {
   echo "Usage: $(basename $0) [SRC_DIR] [OPTION]..."
-  echo "Run clang-format on every C/C++ file in SRC_DIR."
+  echo "Run $CLANG_FORMAT on every C/C++ file in SRC_DIR."
   echo
   echo "Possible OPTIONs are:"
   echo "  -e REGEX  exclude regex pattern"
@@ -50,12 +50,12 @@ function run_clang_format() {
 
   mkdir -p "$EXEC_DIR"
 
-  if ! command -v clang-format &>/dev/null; then
-    echo "Error: Cannot find clang-format in PATH"
+  if ! command -v $CLANG_FORMAT &>/dev/null; then
+    echo "Error: Cannot find $CLANG_FORMAT in PATH"
     return 1
   fi
 
-  printf "Running clang-format on %s\n" "$SRC_DIR"
+  printf "Running $CLANG_FORMAT on %s\n" "$SRC_DIR"
 
   local RETVAL=0 SRC_FILE
   while read -r SRC_FILE; do
@@ -67,10 +67,10 @@ function run_clang_format() {
 
     if $FIX_FORMAT; then
       # fix format in-place
-      clang-format -verbose -i -style=file "$SRC_FILE"
+      $CLANG_FORMAT -verbose -i -style=file "$SRC_FILE"
     else
       # count format errors
-      local FMT_ERRS=$(clang-format -style=file \
+      local FMT_ERRS=$($CLANG_FORMAT -style=file \
                                     -output-replacements-xml \
                                     "$SRC_FILE" \
                         | grep -c "replacement offset")
@@ -79,7 +79,7 @@ function run_clang_format() {
         printf "%4d format error(s) in %s\n" "$FMT_ERRS" "$SRC_FILE"
         if ${VERBOSE}; then
           local TMP_FILE="$EXEC_DIR/$(basename "$SRC_FILE")"
-          clang-format -style=file "$SRC_FILE" > "$TMP_FILE"
+          $CLANG_FORMAT -style=file "$SRC_FILE" > "$TMP_FILE"
           diff --color -u -p "$SRC_FILE" "$TMP_FILE" || true
         fi
       fi

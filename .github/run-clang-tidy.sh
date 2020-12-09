@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-export PATH=".externals/llvm_toolchain/bin:$PATH"
-
 readonly CC_FLAGS=(
   "-std=c++17"
   "-DGLEW_NO_GLU"
@@ -14,7 +12,13 @@ readonly CC_FLAGS=(
   "-I.externals/github_glew/include"
   "-I.externals/github_glfw/include"
   "-I.externals/github_glm"
+  "-I.externals/github_sail/include"
+  "-I.externals/github_freeimage/Source"
+  "-I.externals/github_freeimage/Wrapper/FreeImagePlus"
 )
+
+readonly CLANG=clang${WIN32_EXT:-}
+readonly CLANG_TIDY=clang-tidy${WIN32_EXT:-}
 
 readonly STORAGE_DIR="${TMPDIR:-/tmp}/run-clang-tidy_$USER"
 readonly CACHE_DIR="$STORAGE_DIR/cache"
@@ -24,7 +28,7 @@ readonly FAIL_FLAG="$EXEC_DIR/failed"
 
 function usage() {
   echo "Usage: $(basename $0) [SRC_DIR] [OPTION]..."
-  echo "Run clang-tidy on every C/C++ file in SRC_DIR."
+  echo "Run $CLANG_TIDY on every C/C++ file in SRC_DIR."
   echo
   echo "Possible OPTIONs are:"
   echo "  -e REGEX  exclude regex pattern"
@@ -90,14 +94,15 @@ function exec_clang_tidy() {
 
   if $FIX_ISSUES; then
     # fix issues in-place
-    clang-tidy -fix-errors ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
+    $CLANG_TIDY -fix-errors ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
               &>/dev/null || true
   else
     local CACHE_ENTRY=
 
     if ! $NO_CACHE; then
+    echo ${SRC_FILE}
       # compute hash from file content with all headers included
-      local FILE_CONTENT="$(clang -E ${CC_FLAGS[@]} "${SRC_FILE}" 2>/dev/null)"
+      local FILE_CONTENT="$($CLANG -E ${CC_FLAGS[@]} "${SRC_FILE}" 2>/dev/null)"
       local FILE_HASH="$(compute_hash "$FILE_CONTENT")"
 
       # compute cache entry and exit on cache hit
@@ -106,7 +111,7 @@ function exec_clang_tidy() {
     fi
 
     # exec clang-tidy and store log for this job
-    clang-tidy ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
+    $CLANG_TIDY ${CC_FLAGS[@]/#/-extra-arg=} "$SRC_FILE" \
               2>/dev/null >"$LOG_DIR/$JOB_PID" || true
 
     # if issues are related to this file (and not only to its dependencies)
@@ -123,7 +128,7 @@ function exec_clang_tidy() {
 }
 
 function run_clang_tidy() {
-  local SRC_DIR="$(pwd)"
+  local SRC_DIR="${1:-}"
   local EXCL_REGX=
   local FIX_ISSUES=false
   local NO_CACHE=false
@@ -132,8 +137,9 @@ function run_clang_tidy() {
   local VERBOSE=false
 
   # parse source directory argument
-  if [ -n "$1" ] && ! [[ "$1" =~ ^- ]]; then
-    SRC_DIR="$1"
+  if [ -z "$SRC_DIR" ]; then
+    SRC_DIR=$(pwd)
+  elif ! [[ "$1" =~ ^- ]]; then
     shift
   fi
 
@@ -168,16 +174,16 @@ function run_clang_tidy() {
   mkdir -p "$LOG_DIR"
   mkdir -p "$CACHE_DIR"
 
-  if (! command -v clang || ! command -v clang-tidy) &>/dev/null; then
-    echo "Error: Cannot find clang or clang-tidy in PATH"
+  if (! command -v $CLANG || ! command -v $CLANG_TIDY) &>/dev/null; then
+    echo "Error: Cannot find $CLANG or $CLANG_TIDY in PATH"
     return 1
   fi
 
-  printf "Running clang-tidy on %s\n" "$SRC_DIR"
+  printf "Running $CLANG_TIDY on %s\n" "$SRC_DIR"
 
   local RETVAL=0 CHILD_PIDS=() PID_FILE_MAP=() SRC_FILE
-  local VER_HASH="$(compute_hash "$(clang-tidy -version)")"
-  local CFG_HASH="$(compute_hash "$(clang-tidy -dump-config)")"
+  local VER_HASH="$(compute_hash "$($CLANG_TIDY -version)")"
+  local CFG_HASH="$(compute_hash "$($CLANG_TIDY -dump-config)")"
 
   while read -r SRC_FILE; do
     # skip non-C/C++ files

@@ -1,0 +1,2 @@
+add_library(image_loader STATIC image_loader.cpp)
+target_link_libraries(image_loader PUBLIC github_gsl_lite PRIVATE github_freeimageplus)

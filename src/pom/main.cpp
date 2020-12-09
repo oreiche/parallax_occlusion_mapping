@@ -7,10 +7,17 @@
 
 #include "GL/glew.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "src/pom/image_loader/image_loader.hpp"
 #include "src/pom/renderer/renderer.hpp"
 #include "src/pom/shader_compiler/shader_compiler.hpp"
 
 auto main() -> int {
+  ImageLoader img{};
+  if (!img.load("img/checkerboard.png")) {
+    std::cerr << "Could not load image img/checkerboard.png" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   Renderer renderer{"Tutorial"};
 
   GLuint VertexArrayID{};
@@ -40,41 +47,57 @@ auto main() -> int {
                    sizeof(decltype(g_vertex_buffer_data)::value_type)),
                g_vertex_buffer_data.data(), GL_STATIC_DRAW);
 
-  std::vector<GLfloat> g_colors_data{
-      1.0F, 0.0F, 0.0F,  // t1 red
-      1.0F, 0.0F, 0.0F,  // t1 red
-      1.0F, 0.0F, 0.0F,  // t1 red
-      0.0F, 1.0F, 0.0F,  // t2 blue
-      0.0F, 1.0F, 0.0F,  // t2 blue
-      0.0F, 1.0F, 0.0F,  // t2 blue
+  // Create one OpenGL texture
+  GLuint textureID{};
+  glGenTextures(1, &textureID);
+
+  // "Bind" the newly created texture : all future texture functions will modify
+  // this texture
+  glBindTexture(GL_TEXTURE_2D, textureID);
+
+  // Give the image to OpenGL
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA,
+               GL_UNSIGNED_BYTE, img.data().data());
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+  std::vector<GLfloat> g_tex_coord{
+      0.0F, 0.0F,  // map t1
+      1.0F, 0.0F,  // map t1
+      0.0F, 1.0F,  // map t1
+      0.0F, 1.0F,  // map t2
+      1.0F, 1.0F,  // map t2
+      1.0F, 0.0F,  // map t2
   };
 
-  GLuint color_buffer_id{};
-  glGenBuffers(1, &color_buffer_id);
-  glBindBuffer(GL_ARRAY_BUFFER, color_buffer_id);
+  GLuint tex_coord_id{};
+  glGenBuffers(1, &tex_coord_id);
+  glBindBuffer(GL_ARRAY_BUFFER, tex_coord_id);
   glBufferData(
       GL_ARRAY_BUFFER,
-      gsl::narrow<GLsizeiptr>(g_colors_data.size() *
-                              sizeof(decltype(g_colors_data)::value_type)),
-      g_colors_data.data(), GL_STATIC_DRAW);
+      gsl::narrow<GLsizeiptr>(g_tex_coord.size() *
+                              sizeof(decltype(g_tex_coord)::value_type)),
+      g_tex_coord.data(), GL_STATIC_DRAW);
 
   std::string vertex_shader_code =
       "#version 330 core\n \
 layout(location = 0) in vec3 vertexPosition_modelspace; \
-layout(location = 1) in vec3 vertex_color; \
+layout(location = 1) in vec2 vertexUV; \
 uniform mat4 MVP; \
-out vec3 fragment_color; \
+out vec2 tex_coord; \
 void main() { \
   gl_Position = MVP * vec4(vertexPosition_modelspace, 1.0); \
-  fragment_color = vertex_color; \
+  tex_coord = vertexUV; \
 }";
 
   std::string fragment_shader_code =
       "#version 330 core\n \
-in vec3 fragment_color; \
+in vec2 tex_coord; \
 out vec3 color; \
+uniform sampler2D tex; \
 void main() { \
-  color = fragment_color; \
+  color = texture(tex, tex_coord).rgb; \
 }";
 
   // Create and compile our GLSL program from the shaders
@@ -125,12 +148,12 @@ void main() { \
       );
 
       glEnableVertexAttribArray(1);
-      glBindBuffer(GL_ARRAY_BUFFER, color_buffer_id);
+      glBindBuffer(GL_ARRAY_BUFFER, tex_coord_id);
       glVertexAttribPointer(1,  // attribute 1. No particular reason for 1,
                                 // but must match the layout in the shader.
-                            3,  // size
+                            2,  // size
                             GL_FLOAT,  // type
-                            GL_FALSE,  // normalized?
+                            GL_TRUE,   // normalized?
                             0,         // stride
                             nullptr    // array buffer offset
       );

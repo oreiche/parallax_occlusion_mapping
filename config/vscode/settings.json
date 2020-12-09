@@ -11,6 +11,8 @@
         "-I.externals/github_catch2/single_include",
         "-I.externals/github_glew/include",
         "-I.externals/github_glfw/include",
-        "-I.externals/github_glm"
+        "-I.externals/github_glm",
+        "-I.externals/github_freeimage/Source",
+        "-I.externals/github_freeimage/Wrapper/FreeImagePlus"
     ]
 }
