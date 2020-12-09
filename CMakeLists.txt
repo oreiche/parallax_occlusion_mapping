@@ -15,15 +15,16 @@ include(external/glfw)
 include(external/glm)
 
 if (NOT WIN32)
-    # Convenience symlink to stage directory from source directory
-    file(CREATE_LINK "${EXTERNALS_STAGE_DIR}"
-                     "${PROJECT_SOURCE_DIR}/.externals" SYMBOLIC)
+    # Convenience symlink to externals stage directory from source directory
+    file(CREATE_LINK "${EXTERNALS_STAGE_DIR}" "${PROJECT_SOURCE_DIR}/.externals"
+        SYMBOLIC)
 else()
     file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR}/.externals LINK_PATH)
     file(TO_NATIVE_PATH ${EXTERNALS_STAGE_DIR} TARGET_PATH)
-    message(NOTICE "For convenience, you might want to symlink externals to "
-                   "your source dir via:\n"
-                   "    mklink /d ${LINK_PATH} ${TARGET_PATH}")
+    message(NOTICE
+        "For convenience, you might want to symlink externals to your source "
+        "dir via running the following command in an elevated Powershell:\n"
+        "    New-Item -ItemType SymbolicLink -Path \"${LINK_PATH}\" -Target \"${TARGET_PATH}\"")
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
