@@ -1,6 +1,5 @@
-#include "src/pom/image_loader/image_loader.hpp"
-
 #include "FreeImagePlus.h"
+#include "src/pom/image_loader/image_loader.hpp"
 
 ImageLoader::ImageLoader() noexcept {
   FreeImage_Initialise();

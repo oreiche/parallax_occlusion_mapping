@@ -1,10 +1,9 @@
-#include "shader_compiler.hpp"
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
 #include "gsl/gsl-lite.hpp"
+#include "shader_compiler.hpp"
 
 auto ShaderCompiler::Compile() && noexcept -> std::optional<GLuint> {
   if (!IsInitialized()) {
