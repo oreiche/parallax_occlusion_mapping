@@ -1,6 +1,6 @@
-#include <iostream>
-
 #include "renderer.hpp"
+
+#include <iostream>
 
 Renderer::~Renderer() noexcept { glfwTerminate(); }
 
@@ -64,8 +64,43 @@ auto Renderer::Run(DrawCallback const& draw_call) noexcept -> bool {
     glfwPollEvents();
 
   }  // Check if the ESC key was pressed or the window was closed
-  while (continue_drawing && glfwGetKey(window_, exit_keycode_) != GLFW_PRESS &&
+  while (continue_drawing && HandleKey() &&
          glfwWindowShouldClose(window_) == 0);
 
   return true;
+}
+
+auto Renderer::HandleKey() noexcept -> bool {
+  if (glfwGetKey(window_, GLFW_KEY_W) == GLFW_PRESS) {
+    camera_.Move(Camera::Direction::Forward);
+  }
+  if (glfwGetKey(window_, GLFW_KEY_S) == GLFW_PRESS) {
+    camera_.Move(Camera::Direction::Backward);
+  }
+  if (glfwGetKey(window_, GLFW_KEY_E) == GLFW_PRESS) {
+    camera_.Move(Camera::Direction::Up);
+  }
+  if (glfwGetKey(window_, GLFW_KEY_Q) == GLFW_PRESS) {
+    camera_.Move(Camera::Direction::Down);
+  }
+  if (glfwGetKey(window_, GLFW_KEY_A) == GLFW_PRESS) {
+    camera_.Move(Camera::Direction::Left);
+  }
+  if (glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS) {
+    camera_.Move(Camera::Direction::Right);
+  }
+  if (glfwGetKey(window_, GLFW_KEY_UP) == GLFW_PRESS) {
+    camera_.Turn(Camera::Direction::Up);
+  }
+  if (glfwGetKey(window_, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    camera_.Turn(Camera::Direction::Down);
+  }
+  if (glfwGetKey(window_, GLFW_KEY_LEFT) == GLFW_PRESS) {
+    camera_.Turn(Camera::Direction::Left);
+  }
+  if (glfwGetKey(window_, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+    camera_.Turn(Camera::Direction::Right);
+  }
+
+  return glfwGetKey(window_, exit_keycode_) != GLFW_PRESS;
 }

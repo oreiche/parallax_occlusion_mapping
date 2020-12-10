@@ -115,18 +115,9 @@ void main() { \
         glm::translate(glm::mat4{1.0F},               // identity matrix
                        glm::vec3(0.0F, 0.0F, 0.0F));  // translation vector
 
-    // view matrix
-    auto view_matrix = glm::lookAt(
-        glm::vec3(-3.0F, -4.0F, 4.0F),  // camera position NOLINT
-        glm::vec3(0.0F, 0.0F, 0.0F),    // camera target
-        glm::vec3(0.0F, 0.0F, 1.0F));   // vector defining camera 'up'
-
     // projection matrix
     auto projection_matrix =
         glm::perspective(kFoV, kAspectRatio, kClipNear, kClipFar);
-
-    // accumulated mode view projection matrix
-    auto mvp_matrix = projection_matrix * view_matrix * model_matrix;
 
     // handle to 'MVP' uniform in vertex shader
     auto mvp_id = glGetUniformLocation(*program_id, "MVP");
@@ -157,6 +148,10 @@ void main() { \
                             0,         // stride
                             nullptr    // array buffer offset
       );
+
+      // accumulated mode view projection matrix
+      auto mvp_matrix =
+          projection_matrix * renderer.GetViewMatrix() * model_matrix;
 
       // upload model view projection matrix
       glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &mvp_matrix[0][0]);

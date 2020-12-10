@@ -1,7 +1,2 @@
 Standard: c++17
 BasedOnStyle: Google
-
-# VSCode's xaver.clang-format extension fails to detect main include on Windows,
-# and therefore does not put it as first include. This workaround disables main
-# include detection entirely to get identical behavior on all systems.
-IncludeIsMainRegex: "never$"
