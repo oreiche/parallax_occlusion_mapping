@@ -1,6 +1,6 @@
-#include <iostream>
-
 #include "renderer.hpp"
+
+#include <iostream>
 
 Renderer::~Renderer() noexcept { glfwTerminate(); }
 
