@@ -100,7 +100,6 @@ function exec_clang_tidy() {
     local CACHE_ENTRY=
 
     if ! $NO_CACHE; then
-    echo ${SRC_FILE}
       # compute hash from file content with all headers included
       local FILE_CONTENT="$($CLANG -E ${CC_FLAGS[@]} "${SRC_FILE}" 2>/dev/null)"
       local FILE_HASH="$(compute_hash "$FILE_CONTENT")"
