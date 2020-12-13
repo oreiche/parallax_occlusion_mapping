@@ -48,7 +48,7 @@ function job_limit_reached() {
   shift
   local INPUT_PIDS=("$@")
   local COUNT=0
-  for PID in "${INPUT_PIDS[@]}"; do
+  for PID in "${INPUT_PIDS[@]:-}"; do
     if ps -p $PID &>/dev/null; then COUNT=$(($COUNT+1)); fi
     if [ $COUNT -ge $JOB_LIMIT ]; then return 0; fi
   done
@@ -58,12 +58,12 @@ function job_limit_reached() {
 function collect_running_pids() {
   local INPUT_PIDS=("$@")
   local RUNNING_PIDS=()
-  for PID in "${INPUT_PIDS[@]}"; do
+  for PID in "${INPUT_PIDS[@]:-}"; do
     if ps -p $PID &>/dev/null; then
       RUNNING_PIDS+=("$PID")
     fi
   done
-  echo "${RUNNING_PIDS[@]}"
+  echo "${RUNNING_PIDS[@]:-}"
 }
 
 function parse_issues_from_log() {
@@ -180,7 +180,8 @@ function run_clang_tidy() {
 
   printf "Running $CLANG_TIDY on %s\n" "$SRC_DIR"
 
-  local RETVAL=0 CHILD_PIDS=() PID_FILE_MAP=() SRC_FILE
+  local RETVAL=0
+  local CHILD_PIDS=() PID_FILE_MAP=() SRC_FILE
   local VER_HASH="$(compute_hash "$($CLANG_TIDY -version)")"
   local CFG_HASH="$(compute_hash "$($CLANG_TIDY -dump-config)")"
 
@@ -192,9 +193,9 @@ function run_clang_tidy() {
     if [ -n "$EXCL_REGX" ] && [[ "$SRC_FILE" =~ $EXCL_REGX ]]; then continue; fi
 
     # adhere to job limit
-    while job_limit_reached $JOB_LIMIT "${CHILD_PIDS[@]}"; do
+    while job_limit_reached $JOB_LIMIT "${CHILD_PIDS[@]:-}"; do
       # wait for at least one job to finish
-      wait -fn ${CHILD_PIDS[@]}
+      wait -n ${CHILD_PIDS[@]:-}
     done
 
     # early exit on failure
@@ -204,12 +205,12 @@ function run_clang_tidy() {
     exec_clang_tidy "$SRC_FILE" $VER_HASH $CFG_HASH $FIX_ISSUES $NO_CACHE &
 
     # record new child pid
-    CHILD_PIDS=($(collect_running_pids "${CHILD_PIDS[@]}" "$!"))
+    CHILD_PIDS=($(collect_running_pids "${CHILD_PIDS[@]:-}" "$!"))
     PID_FILE_MAP[$!]="$SRC_FILE"
   done < <(find "${SRC_DIR}" -type f)
 
   # wait for all remaining children to finish
-  wait -f ${CHILD_PIDS[@]}
+  wait ${CHILD_PIDS[@]:-}
 
   if [ -f "$FAIL_FLAG" ]; then
     RETVAL=1
