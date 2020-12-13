@@ -71,6 +71,9 @@ function parse_issues_from_log() {
   local FILE_FILTER=$2
   local PATTERN="[0-9]\+:[0-9]\+"
 
+  # transform all backslashes to forward slashes (if any)
+  sed -i 's/\\/\//g' "${LOG_FILE}"
+
   # count all errors, also from file dependencies
   local NUM_ERRS=$(grep -c "$PATTERN:\ error:\ " "$LOG_FILE")
 
