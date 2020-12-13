@@ -31,7 +31,11 @@ auto main(int argc, char* argv[]) -> int {
   int result{-1};
 
   if (init_gl_context()) {
-    result = Catch::Session().run(argc, argv);
+    try {
+      result = Catch::Session().run(argc, argv);
+    } catch (...) {
+      result = EXIT_FAILURE;
+    }
   }
 
   deinit_gl_context();
