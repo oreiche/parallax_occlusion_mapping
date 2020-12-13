@@ -103,21 +103,31 @@ auto main() -> int {
 layout(location = 0) in vec3 vertexPosition_modelspace; \
 layout(location = 1) in vec2 vertexUV; \
 uniform mat4 MVP; \
+uniform vec3 camPos; \
 out vec2 tex_coord; \
+flat out int val; \
 void main() { \
   gl_Position = MVP * vec4(vertexPosition_modelspace, 1.0); \
   tex_coord = vertexUV; \
+  if (camPos.x < 0) { \
+    val = 1; \
+  } else val = 0; \
 }";
 
   std::string fragment_shader_code =
       "#version 330 core\n \
 in vec2 tex_coord; \
+flat in int val; \
 out vec3 color; \
 uniform sampler2D tex; \
 uniform sampler2D depth_map; \
 void main() { \
-  color = texture(tex, tex_coord).rgb \
-        + texture(depth_map, tex_coord).rgb; \
+  if (val == 1) { \
+    color = vec3(1, 0, 0); \
+  } else { \
+    color = texture(tex, tex_coord).rgb \
+          + texture(depth_map, tex_coord).rgb; \
+  } \
 }";
 
   // Create and compile our GLSL program from the shaders
@@ -141,6 +151,7 @@ void main() { \
 
     // handle to 'MVP' uniform in vertex shader
     auto mvp_id = glGetUniformLocation(*program_id, "MVP");
+    auto pos_id = glGetUniformLocation(*program_id, "camPos");
     auto tex_id = glGetUniformLocation(*program_id, "tex");
     auto map_id = glGetUniformLocation(*program_id, "depth_map");
 
@@ -175,8 +186,11 @@ void main() { \
       auto mvp_matrix =
           projection_matrix * renderer.GetViewMatrix() * model_matrix;
 
+      auto cam_pos = renderer.GetCameraPosition();
+
       // upload model view projection matrix
       glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &mvp_matrix[0][0]);
+      glUniform3fv(pos_id, 1, &cam_pos[0]);
       glUniform1i(tex_id, 0);
       glUniform1i(map_id, 1);
 

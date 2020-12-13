@@ -25,6 +25,9 @@ class Renderer {
 
   [[nodiscard]] auto Run(DrawCallback const& draw_call) noexcept -> bool;
 
+  [[nodiscard]] auto GetCameraPosition() const noexcept -> glm::vec3 {
+    return camera_.GetPosition();
+  }
   [[nodiscard]] auto GetViewMatrix() const noexcept -> glm::mat4 {
     return camera_.GetViewMatrix();
   }

@@ -9,6 +9,10 @@ class Camera {
  public:
   enum class Direction { Up, Down, Left, Right, Forward, Backward };
 
+  [[nodiscard]] auto GetPosition() const noexcept -> glm::vec3 {
+    return position_;
+  }
+
   [[nodiscard]] auto GetViewMatrix() const noexcept -> glm::mat4 {
     return view_matrix_;
   }
