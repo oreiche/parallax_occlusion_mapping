@@ -12,9 +12,16 @@
 #include "src/pom/shader_compiler/shader_compiler.hpp"
 
 auto main() -> int {
-  ImageLoader img{};
-  if (!img.load("img/checkerboard.png")) {
+  ImageLoader checkerboard{};
+  ImageLoader depth_map{};
+
+  if (!checkerboard.load("img/checkerboard.png")) {
     std::cerr << "Could not load image img/checkerboard.png" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (!depth_map.load("img/depth_map.png")) {
+    std::cerr << "Could not load image img/depth_map.png" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -53,12 +60,23 @@ auto main() -> int {
 
   // "Bind" the newly created texture : all future texture functions will modify
   // this texture
+  glActiveTexture(GL_TEXTURE0 + 0);
   glBindTexture(GL_TEXTURE_2D, textureID);
 
   // Give the image to OpenGL
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.width(), img.height(), 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, img.data().data());
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkerboard.width(),
+               checkerboard.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+               checkerboard.data().data());
 
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+  GLuint depthmapID{};
+  glGenTextures(1, &depthmapID);
+  glActiveTexture(GL_TEXTURE0 + 1);
+  glBindTexture(GL_TEXTURE_2D, depthmapID);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, depth_map.width(), depth_map.height(),
+               0, GL_RGBA, GL_UNSIGNED_BYTE, depth_map.data().data());
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -96,8 +114,10 @@ void main() { \
 in vec2 tex_coord; \
 out vec3 color; \
 uniform sampler2D tex; \
+uniform sampler2D depth_map; \
 void main() { \
-  color = texture(tex, tex_coord).rgb; \
+  color = texture(tex, tex_coord).rgb \
+        + texture(depth_map, tex_coord).rgb; \
 }";
 
   // Create and compile our GLSL program from the shaders
@@ -121,6 +141,8 @@ void main() { \
 
     // handle to 'MVP' uniform in vertex shader
     auto mvp_id = glGetUniformLocation(*program_id, "MVP");
+    auto tex_id = glGetUniformLocation(*program_id, "tex");
+    auto map_id = glGetUniformLocation(*program_id, "depth_map");
 
     auto render_status = renderer.Run([&] {
       // Use our shader
@@ -155,6 +177,8 @@ void main() { \
 
       // upload model view projection matrix
       glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &mvp_matrix[0][0]);
+      glUniform1i(tex_id, 0);
+      glUniform1i(map_id, 1);
 
       // Draw the triangle !
       glDrawArrays(
