@@ -1,7 +1,7 @@
 #ifndef SRC_POM_RENDERER_CAMERA_HPP
 #define SRC_POM_RENDERER_CAMERA_HPP
 
-#include <cmath>
+#include <algorithm>
 
 #include "glm/gtc/matrix_transform.hpp"
 
