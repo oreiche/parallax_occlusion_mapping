@@ -39,7 +39,7 @@ class Renderer {
   int exit_keycode_{GLFW_KEY_ESCAPE};
 
   [[nodiscard]] auto Initialize() noexcept -> bool;
-  [[nodiscard]] auto HandleKey() noexcept -> bool;
+  [[nodiscard]] auto HandleKey(bool move_cam) noexcept -> bool;
 };
 
 #endif  // SRC_POM_RENDERER_RENDERER_HPP
