@@ -54,6 +54,42 @@ auto main() -> int {
                    sizeof(decltype(g_vertex_buffer_data)::value_type)),
                g_vertex_buffer_data.data(), GL_STATIC_DRAW);
 
+  // normal vector, point upwards orthogonal to triangle surface
+  std::vector<GLfloat> g_vertex_normals_data{
+      0.0F, 0.0F, 1.0F,  // t1 v1
+      0.0F, 0.0F, 1.0F,  // t1 v2
+      0.0F, 0.0F, 1.0F,  // t1 v3
+      0.0F, 0.0F, 1.0F,  // t2 v1
+      0.0F, 0.0F, 1.0F,  // t2 v2
+      0.0F, 0.0F, 1.0F,  // t2 v3
+  };
+  GLuint vertex_normals_id{};
+  glGenBuffers(1, &vertex_normals_id);
+  glBindBuffer(GL_ARRAY_BUFFER, vertex_normals_id);
+  glBufferData(GL_ARRAY_BUFFER,
+               gsl::narrow<GLsizeiptr>(
+                   g_vertex_normals_data.size() *
+                   sizeof(decltype(g_vertex_normals_data)::value_type)),
+               g_vertex_normals_data.data(), GL_STATIC_DRAW);
+
+  // base vector, point in x direction along triangle surface
+  std::vector<GLfloat> g_vertex_base_data{
+      1.0F, 0.0F, 0.0F,  // t1 v1
+      1.0F, 0.0F, 0.0F,  // t1 v2
+      1.0F, 0.0F, 0.0F,  // t1 v3
+      1.0F, 0.0F, 0.0F,  // t2 v1
+      1.0F, 0.0F, 0.0F,  // t2 v2
+      1.0F, 0.0F, 0.0F,  // t2 v3
+  };
+  GLuint vertex_base_id{};
+  glGenBuffers(1, &vertex_base_id);
+  glBindBuffer(GL_ARRAY_BUFFER, vertex_base_id);
+  glBufferData(
+      GL_ARRAY_BUFFER,
+      gsl::narrow<GLsizeiptr>(g_vertex_base_data.size() *
+                              sizeof(decltype(g_vertex_base_data)::value_type)),
+      g_vertex_base_data.data(), GL_STATIC_DRAW);
+
   // Create one OpenGL texture
   GLuint textureID{};
   glGenTextures(1, &textureID);
@@ -102,13 +138,19 @@ auto main() -> int {
       "#version 330 core\n \
 layout(location = 0) in vec3 vertexPosition_modelspace; \
 layout(location = 1) in vec2 vertexUV; \
-uniform mat4 MVP; \
+layout(location = 2) in vec3 vertexNormal; \
+layout(location = 3) in vec3 vertexBase; \
+uniform mat4 M; \
+uniform mat4 VP; \
 uniform vec3 camPos; \
 out vec2 tex_coord; \
+out vec3 camDirection; \
 flat out int val; \
 void main() { \
-  gl_Position = MVP * vec4(vertexPosition_modelspace, 1.0); \
+  vec3 normal = vertexNormal; \
+  gl_Position = VP * M * vec4(vertexPosition_modelspace, 1.0); \
   tex_coord = vertexUV; \
+  camDirection = camPos - (M * vec4(vertexPosition_modelspace, 1.0)).xyz; \
   if (camPos.x < 0) { \
     val = 1; \
   } else val = 0; \
@@ -117,16 +159,29 @@ void main() { \
   std::string fragment_shader_code =
       "#version 330 core\n \
 in vec2 tex_coord; \
+in vec3 camDirection; \
 flat in int val; \
 out vec3 color; \
 uniform sampler2D tex; \
 uniform sampler2D depth_map; \
 void main() { \
-  if (val == 1) { \
+  if (camDirection.z < 0) { \
     color = vec3(1, 0, 0); \
   } else { \
-    color = texture(tex, tex_coord).rgb \
-          + texture(depth_map, tex_coord).rgb; \
+    vec3 search_vec = normalize(camDirection); \
+    float max_map_height = 0.1; \
+    float len = max_map_height / search_vec.z; \
+    float step = 0.001; \
+    float map_height = 0; \
+    vec3 pos; \
+    while (len > 0) { \
+      pos = len * search_vec; \
+      map_height = max_map_height * texture(depth_map, tex_coord + pos.xy).r; \
+      if (map_height >= pos.z) break; \
+      len -= step; \
+    } \
+    if (len <= 0) pos = vec3(0, 0, 0); \
+    color = texture(tex, tex_coord + pos.xy).rgb; \
   } \
 }";
 
@@ -149,8 +204,9 @@ void main() { \
     auto projection_matrix =
         glm::perspective(kFoV, kAspectRatio, kClipNear, kClipFar);
 
-    // handle to 'MVP' uniform in vertex shader
-    auto mvp_id = glGetUniformLocation(*program_id, "MVP");
+    // handle to 'VP' uniform in vertex shader
+    auto vp_id = glGetUniformLocation(*program_id, "VP");
+    auto m_id = glGetUniformLocation(*program_id, "M");
     auto pos_id = glGetUniformLocation(*program_id, "camPos");
     auto tex_id = glGetUniformLocation(*program_id, "tex");
     auto map_id = glGetUniformLocation(*program_id, "depth_map");
@@ -182,14 +238,34 @@ void main() { \
                             nullptr    // array buffer offset
       );
 
+      glEnableVertexAttribArray(2);
+      glBindBuffer(GL_ARRAY_BUFFER, vertex_normals_id);
+      glVertexAttribPointer(2,
+                            3,         // size
+                            GL_FLOAT,  // type
+                            GL_TRUE,   // normalized?
+                            0,         // stride
+                            nullptr    // array buffer offset
+      );
+
+      glEnableVertexAttribArray(3);
+      glBindBuffer(GL_ARRAY_BUFFER, vertex_base_id);
+      glVertexAttribPointer(3,
+                            3,         // size
+                            GL_FLOAT,  // type
+                            GL_TRUE,   // normalized?
+                            0,         // stride
+                            nullptr    // array buffer offset
+      );
+
       // accumulated mode view projection matrix
-      auto mvp_matrix =
-          projection_matrix * renderer.GetViewMatrix() * model_matrix;
+      auto vp_matrix = projection_matrix * renderer.GetViewMatrix();
 
       auto cam_pos = renderer.GetCameraPosition();
 
       // upload model view projection matrix
-      glUniformMatrix4fv(mvp_id, 1, GL_FALSE, &mvp_matrix[0][0]);
+      glUniformMatrix4fv(vp_id, 1, GL_FALSE, &vp_matrix[0][0]);
+      glUniformMatrix4fv(m_id, 1, GL_FALSE, &model_matrix[0][0]);
       glUniform3fv(pos_id, 1, &cam_pos[0]);
       glUniform1i(tex_id, 0);
       glUniform1i(map_id, 1);
@@ -201,6 +277,8 @@ void main() { \
       );
       glDisableVertexAttribArray(0);
       glDisableVertexAttribArray(1);
+      glDisableVertexAttribArray(2);
+      glDisableVertexAttribArray(3);
 
       return true;  // Run forever
     });
