@@ -117,5 +117,9 @@ auto Renderer::HandleKey(bool move_cam) noexcept -> bool {
     }
   }
 
+  if (glfwGetKey(window_, GLFW_KEY_F) == GLFW_PRESS) {
+    lock_cam_ = !lock_cam_;
+  }
+
   return glfwGetKey(window_, exit_keycode_) != GLFW_PRESS;
 }
