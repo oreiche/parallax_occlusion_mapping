@@ -23,10 +23,10 @@ if (RUN_ANALYSIS)
         set(EXPORTS "export PATH=\"${llvm_toolchain_ROOT}/bin\":$PATH;")
     endif()
 
-    add_test(NAME code_analysis_clang-format
+    add_test(NAME static_analysis_clang-format
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             COMMAND ${BASH_EXE} -c "${EXPORTS} .github/run-clang-format.sh src/ -v -e test.*data")
-    add_test(NAME code_analysis_clang-tidy
+    add_test(NAME static_analysis_clang-tidy
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             COMMAND ${BASH_EXE} -c "${EXPORTS} .github/run-clang-tidy.sh src/ -v -e test.*data")
 endif()
