@@ -9,6 +9,8 @@ class Camera {
  public:
   enum class Direction { Up, Down, Left, Right, Forward, Backward };
 
+  Camera() noexcept { UpdateViewMatrix(); }
+
   [[nodiscard]] auto GetPosition() const noexcept -> glm::vec3 {
     return position_;
   }
@@ -79,8 +81,8 @@ class Camera {
   static auto constexpr kMaxPitch = glm::radians(80.0F);
 
   glm::mat4 view_matrix_{};
-  glm::vec3 position_{0.0F, 0.0F, 1.0F};
-  glm::vec3 angle_{0.0F, 0.0F, 0.0F};
+  glm::vec3 position_{0.0F, -2.0F, 1.0F};
+  glm::vec3 angle_{0.0F, -10.0F, 0.0F};
 
   [[nodiscard]] auto GetYaw() const& noexcept -> float { return angle_[0]; }
   [[nodiscard]] auto GetYaw() & noexcept -> float& { return angle_[0]; }
