@@ -170,17 +170,17 @@ void main() { \
   } else { \
     vec3 search_vec = normalize(camDirection); \
     float max_map_height = 0.1; \
-    float len = max_map_height / search_vec.z; \
-    float step = 0.001; \
+    float step = max_map_height / search_vec.z; \
     float map_height = 0; \
-    vec3 pos; \
-    while (len > 0) { \
-      pos = len * search_vec; \
+    vec3 pos = step * search_vec; \
+    float direction = -1; \
+    do { \
+      step = 0.5 * step; \
+      if (map_height > pos.z) direction = 1; \
+      else direction = -1; \
+      pos += direction * step * search_vec; \
       map_height = max_map_height * texture(depth_map, tex_coord + pos.xy).r; \
-      if (map_height >= pos.z) break; \
-      len -= step; \
-    } \
-    if (len <= 0) pos = vec3(0, 0, 0); \
+    } while (step > 0.001); \
     color = texture(tex, tex_coord + pos.xy).rgb; \
   } \
 }";
