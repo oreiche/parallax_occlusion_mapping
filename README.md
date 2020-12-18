@@ -1,5 +1,6 @@
 <p align="center">
-  <a href="https://github.com/oreiche/parallax_occlusion_mapping/actions?query=workflow%3A%22Test%20and%20Test%22+event%3Apush"><img alt="Build and Test" src="https://github.com/oreiche/parallax_occlusion_mapping/workflows/Build%20and%20Test/badge.svg?event=push"></a>
+  <a href="https://github.com/oreiche/parallax_occlusion_mapping/actions?query=workflow%3A%22Linux%20Build%20and%20Test%22+event%3Apush"><img alt="Linux Build and Test" src="https://github.com/oreiche/parallax_occlusion_mapping/workflows/Linux%20Build%20and%20Test/badge.svg?event=push"></a>
+  <a href="https://github.com/oreiche/parallax_occlusion_mapping/actions?query=workflow%3A%22Windows%20Build%20and%20Test%22+event%3Apush"><img alt="Windows Build and Test" src="https://github.com/oreiche/parallax_occlusion_mapping/workflows/Windows%20Build%20and%20Test/badge.svg?event=push"></a>
   <a href="https://github.com/oreiche/parallax_occlusion_mapping/actions?query=workflow%3A%22Static%20Code%20Analysis%22+event%3Apush"><img alt="Static Code Analysis" src="https://github.com/oreiche/parallax_occlusion_mapping/workflows/Static%20Code%20Analysis/badge.svg?event=push"></a>
 </p>
 

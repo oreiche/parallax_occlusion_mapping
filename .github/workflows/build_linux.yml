@@ -1,4 +1,4 @@
-name: Build and Test
+name: Linux Build and Test
 
 on:
   push:
@@ -43,37 +43,3 @@ jobs:
 
         - name: Run tests and memcheck
           run: cd .build; ctest --output-on-failure
-
-    windows_release:
-      name: Windows Release
-      if: "!contains(github.event.head_commit.message, '[skip ci]')"
-      runs-on: windows-2019
-      steps:
-        - name: Checkout sources
-          uses: actions/checkout@v2
-
-        - name: Configure project
-          run: cmake -S . -B .build -DOPENGL_TESTS=OFF
-
-        - name: Build project
-          run: cmake --build .build --config Release -j
-
-        - name: Run tests
-          run: cd .build; ctest --output-on-failure -C Release
-
-    windows_debug:
-      name: Windows Debug
-      if: "!contains(github.event.head_commit.message, '[skip ci]')"
-      runs-on: windows-2019
-      steps:
-        - name: Checkout sources
-          uses: actions/checkout@v2
-
-        - name: Configure project
-          run: cmake -S . -B .build -DOPENGL_TESTS=OFF
-
-        - name: Build project
-          run: cmake --build .build --config Debug -j
-
-        - name: Run tests
-          run: cd .build; ctest --output-on-failure -C Debug
