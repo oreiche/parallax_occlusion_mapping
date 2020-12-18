@@ -4,19 +4,19 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/.externals/github_gsl_lite/include",
-                "${workspaceFolder}/.externals/github_catch2/single_include",
-                "${workspaceFolder}/.externals/github_glew/include",
-                "${workspaceFolder}/.externals/github_glfw/include",
-                "${workspaceFolder}/.externals/github_glm",
-                "${workspaceFolder}/.externals/github_freeimage/Source",
-                "${workspaceFolder}/.externals/github_freeimage/Wrapper/FreeImagePlus"
+                "${workspaceFolder}/.externals/github_gsl_lite-src/include",
+                "${workspaceFolder}/.externals/github_catch2-src/single_include",
+                "${workspaceFolder}/.externals/github_glew-src/include",
+                "${workspaceFolder}/.externals/github_glfw-src/include",
+                "${workspaceFolder}/.externals/github_glm-src",
+                "${workspaceFolder}/.externals/github_freeimage-src/Source",
+                "${workspaceFolder}/.externals/github_freeimage-src/Wrapper/FreeImagePlus"
             ],
             "defines": [
                 "GLEW_NO_GLU",
                 "WITH_OPENGL"
             ],
-            "compilerPath": "${workspaceFolder}/.externals/llvm_toolchain/bin/clang",
+            "compilerPath": "${workspaceFolder}/.externals/llvm_toolchain-src/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
@@ -25,13 +25,13 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/.externals/github_gsl_lite/include",
-                "${workspaceFolder}/.externals/github_catch2/single_include",
-                "${workspaceFolder}/.externals/github_glew/include",
-                "${workspaceFolder}/.externals/github_glfw/include",
-                "${workspaceFolder}/.externals/github_glm",
-                "${workspaceFolder}/.externals/github_freeimage/Source",
-                "${workspaceFolder}/.externals/github_freeimage/Wrapper/FreeImagePlus"
+                "${workspaceFolder}/.externals/github_gsl_lite-src/include",
+                "${workspaceFolder}/.externals/github_catch2-src/single_include",
+                "${workspaceFolder}/.externals/github_glew-src/include",
+                "${workspaceFolder}/.externals/github_glfw-src/include",
+                "${workspaceFolder}/.externals/github_glm-src",
+                "${workspaceFolder}/.externals/github_freeimage-src/Source",
+                "${workspaceFolder}/.externals/github_freeimage-src/Wrapper/FreeImagePlus"
             ],
             "defines": [
                 "GLEW_NO_GLU",

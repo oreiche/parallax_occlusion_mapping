@@ -7,14 +7,14 @@ readonly CC_FLAGS=(
   "-DGLEW_NO_GLU"
   "-DWITH_OPENGL"
   "-I."
-  "-I.externals/github_gsl_lite/include"
-  "-I.externals/github_catch2/single_include"
-  "-I.externals/github_glew/include"
-  "-I.externals/github_glfw/include"
-  "-I.externals/github_glm"
-  "-I.externals/github_sail/include"
-  "-I.externals/github_freeimage/Source"
-  "-I.externals/github_freeimage/Wrapper/FreeImagePlus"
+  "-I.externals/github_gsl_lite-src/include"
+  "-I.externals/github_catch2-src/single_include"
+  "-I.externals/github_glew-src/include"
+  "-I.externals/github_glfw-src/include"
+  "-I.externals/github_glm-src"
+  "-I.externals/github_sail-src/include"
+  "-I.externals/github_freeimage-src/Source"
+  "-I.externals/github_freeimage-src/Wrapper/FreeImagePlus"
 )
 
 readonly CLANG=clang${WIN32_EXT:-}

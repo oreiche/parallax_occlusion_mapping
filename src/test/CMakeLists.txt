@@ -18,9 +18,9 @@ if (RUN_ANALYSIS)
 
     if (WIN32)
         set(EXPORTS "export WIN32_EXT=.exe;")
-    elseif (llvm_toolchain_ROOT)
+    elseif (llvm_toolchain_SOURCE_DIR)
         # if external llvm_toolchain is used
-        set(EXPORTS "export PATH=\"${llvm_toolchain_ROOT}/bin\":$PATH;")
+        set(EXPORTS "export PATH=\"${llvm_toolchain_SOURCE_DIR}/bin\":$PATH;")
     endif()
 
     add_test(NAME static_analysis_clang-format

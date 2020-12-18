@@ -1,0 +1,45 @@
+name: Linux Build and Test
+
+on:
+  push:
+
+jobs:
+    linux_release:
+      name: Linux Release
+      if: "!contains(github.event.head_commit.message, '[skip ci]')"
+      runs-on: ubuntu-20.04
+      steps:
+        - name: Checkout sources
+          uses: actions/checkout@v2
+
+        - name: Install dependencies
+          run: sh .github/install_dependencies.sh
+
+        - name: Configure project
+          run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Release -DOPENGL_TESTS=OFF
+
+        - name: Build project
+          run: cmake --build .build -j
+
+        - name: Run tests and memcheck
+          run: cd .build; ctest --output-on-failure
+
+    linux_debug:
+      name: Linux Debug
+      if: "!contains(github.event.head_commit.message, '[skip ci]')"
+      runs-on: ubuntu-20.04
+      steps:
+        - name: Checkout sources
+          uses: actions/checkout@v2
+
+        - name: Install dependencies
+          run: sh .github/install_dependencies.sh
+
+        - name: Configure project
+          run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DCMAKE_BUILD_TYPE=Debug -DOPENGL_TESTS=OFF
+
+        - name: Build project
+          run: cmake --build .build -j
+
+        - name: Run tests and memcheck
+          run: cd .build; ctest --output-on-failure

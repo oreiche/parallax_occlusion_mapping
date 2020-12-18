@@ -1,12 +1,13 @@
+include(FetchContent)
+
 # Get GSL from GitHub
-http_archive(
-    NAME     github_gsl_lite
-    URL      "https://github.com/gsl-lite/gsl-lite/archive/0.37.0.zip"
-    SHA256   980c8e91dd25bfaac7bfbd7151f04027fa68ff0bf652baa11de137242641e399
-    PATTERNS "gsl-lite-0.37.0/include"
-    STRIP    "gsl-lite-0.37.0")
+FetchContent_Declare(
+    github_gsl_lite
+    GIT_REPOSITORY https://github.com/gsl-lite/gsl-lite.git
+    GIT_TAG        v0.37.0)
+FetchContent_MakeAvailable(github_gsl_lite)
 
 # Create header-only library
 add_library(github_gsl_lite INTERFACE)
-target_include_directories(github_gsl_lite
-                           INTERFACE ${github_gsl_lite_ROOT}/include)
+target_include_directories(github_gsl_lite INTERFACE
+                           ${github_gsl_lite_SOURCE_DIR}/include)

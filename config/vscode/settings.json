@@ -1,18 +1,18 @@
 {
     // use clang from external toolchain
-    //"clang-format.executable": ".externals/llvm_toolchain/bin/clang-format",
-    //"clang-tidy.executable": ".externals/llvm_toolchain/bin/clang-tidy",
+    //"clang-format.executable": ".externals/llvm_toolchain-src/bin/clang-format",
+    //"clang-tidy.executable": ".externals/llvm_toolchain-src/bin/clang-tidy",
     "clang-tidy.compilerArgs": [
         "-std=c++17",
         "-DGLEW_NO_GLU",
         "-DWITH_OPENGL",
         "-I.",
-        "-I.externals/github_gsl_lite/include",
-        "-I.externals/github_catch2/single_include",
-        "-I.externals/github_glew/include",
-        "-I.externals/github_glfw/include",
-        "-I.externals/github_glm",
-        "-I.externals/github_freeimage/Source",
-        "-I.externals/github_freeimage/Wrapper/FreeImagePlus"
+        "-I.externals/github_gsl_lite-src/include",
+        "-I.externals/github_catch2-src/single_include",
+        "-I.externals/github_glew-src/include",
+        "-I.externals/github_glfw-src/include",
+        "-I.externals/github_glm-src",
+        "-I.externals/github_freeimage-src/Source",
+        "-I.externals/github_freeimage-src/Wrapper/FreeImagePlus"
     ]
 }
