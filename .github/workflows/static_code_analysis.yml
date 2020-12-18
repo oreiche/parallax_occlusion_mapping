@@ -13,9 +13,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: |
-          sh .github/install_dependencies.sh ~/.local
-          echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
+        run: sh .github/install_dependencies.sh
 
         # get toolchain and external dependencies
       - name: Configure project
@@ -33,9 +31,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: |
-          sh .github/install_dependencies.sh ~/.local
-          echo "PATH=~/.local/bin:$PATH" >> $GITHUB_ENV
+        run: sh .github/install_dependencies.sh
 
         # get toolchain and external dependencies
       - name: Configure project

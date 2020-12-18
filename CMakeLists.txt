@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.14)
 project(ParallaxOcclusionMapping CXX)
 enable_testing()
 
@@ -7,7 +7,6 @@ if (CMAKE_TOOLCHAIN_FILE)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-include(externals)
 include(external/gsl_lite)
 include(external/catch2)
 include(external/glew)
@@ -17,11 +16,11 @@ include(external/freeimage)
 
 if (NOT WIN32)
     # Convenience symlink to externals stage directory from source directory
-    file(CREATE_LINK "${EXTERNALS_STAGE_DIR}" "${PROJECT_SOURCE_DIR}/.externals"
+    file(CREATE_LINK "${PROJECT_BINARY_DIR}/_deps" "${PROJECT_SOURCE_DIR}/.externals"
         SYMBOLIC)
 else()
     file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR}/.externals LINK_PATH)
-    file(TO_NATIVE_PATH ${EXTERNALS_STAGE_DIR} TARGET_PATH)
+    file(TO_NATIVE_PATH ${PROJECT_BINARY_DIR}/_deps TARGET_PATH)
     message(NOTICE
         "For convenience, you might want to symlink externals to your source "
         "dir via running the following command in an elevated Powershell:\n"
