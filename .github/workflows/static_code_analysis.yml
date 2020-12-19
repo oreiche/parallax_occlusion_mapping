@@ -1,7 +1,7 @@
 name: Static Code Analysis
 
 on:
-  push:
+  pull_request:
 
 jobs:
   clang-format:
@@ -17,7 +17,10 @@ jobs:
 
         # get toolchain and external dependencies
       - name: Configure project
-        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DRUN_ANALYSIS=ON
+        run: |
+          cmake -S . -B .build \
+            -DRUN_ANALYSIS=ON \
+            -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
 
       - name: Run clang-format
         run: cd .build; ctest --output-on-failure -R static_analysis_clang-format
@@ -35,7 +38,10 @@ jobs:
 
         # get toolchain and external dependencies
       - name: Configure project
-        run: cmake -S . -B .build -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake -DRUN_ANALYSIS=ON
+        run: |
+          cmake -S . -B .build \
+            -DRUN_ANALYSIS=ON \
+            -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/clang11_linux_x86_64.cmake
 
       - name: Run clang-tidy
         run: cd .build; ctest --output-on-failure -R static_analysis_clang-tidy
